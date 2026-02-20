@@ -13,10 +13,24 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            // $table->integer('id_sede');
             $table->string('name');
+            $table->string('lastname');
+            $table->integer('dni');
+            $table->integer('phone');
+            $table->string('address');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('children');
+            $table->enum('affiliate',['ONP', 'AFP'])->default('AFP');
+            $table->enum('insured',['EsSalud','SIS'])->default('EsSalud');
+            $table->enum('work_modality',['fullTime', 'partTime'])->default('fullTime');
+            $table->timestamp('entry_date');
+            $table->enum('retention',['yes','no']);
+            $table->enum('entry_to_payroll',['yes','no']);
+            $table->enum('role',['root', 'managment', 'administrator_general', 'logistic_general','administrator','logistic' ,'cashier','asistente']);
+            $table->enum('state', ['active', 'inactive']);
             $table->rememberToken();
             $table->timestamps();
         });
