@@ -17,6 +17,7 @@ import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
 import products from '@/routes/products';
+import users from '@/routes/users';
 
 const mainNavItems: NavItem[] = [
     {
@@ -25,10 +26,15 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Users',
+        href: users.index.url(),
+        icon: LayoutGrid,
+    },
+    {
         title: 'Products',
         href: products.index.url(),
         icon: LayoutGrid,
-    },
+    }
 ];
 
 const footerNavItems: NavItem[] = [

@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
+use function Symfony\Component\Clock\now;
+
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules, ProfileValidationRules;
@@ -26,8 +28,14 @@ class CreateNewUser implements CreatesNewUsers
 
         return User::create([
             'name' => $input['name'],
+            'lastname' => '',
+            'dni' => 1,
+            'phone' => 1,
+            'address' => '',
+            'children' => '',
             'email' => $input['email'],
             'password' => $input['password'],
+            'entry_date' => now(),
         ]);
     }
 }
