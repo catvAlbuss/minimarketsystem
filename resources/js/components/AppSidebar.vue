@@ -16,8 +16,13 @@ import {
 import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
+//RUTAS AGREGADAS
 import products from '@/routes/products';
+<<<<<<< HEAD
 import users from '@/routes/users';
+=======
+import customers from '@/routes/customers';
+>>>>>>> ae932c8097be564bb2d3d9507b665fa076550c2e
 
 const mainNavItems: NavItem[] = [
     {
@@ -34,6 +39,14 @@ const mainNavItems: NavItem[] = [
         title: 'Products',
         href: products.index.url(),
         icon: LayoutGrid,
+<<<<<<< HEAD
+=======
+    },
+    {
+        title: 'Clientes',
+        href: customers.index.url(),
+        icon: LayoutGrid,
+>>>>>>> ae932c8097be564bb2d3d9507b665fa076550c2e
     }
 ];
 
