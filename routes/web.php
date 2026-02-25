@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -19,9 +20,12 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
-    Route::resource('products', ProductsController::class); 
+    Route::resource('products', ProductsController::class);
+    Route::resource('customers', CustomerController::class);
     // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
 });
+
+
 
 
 

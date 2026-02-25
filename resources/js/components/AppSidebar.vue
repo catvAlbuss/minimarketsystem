@@ -16,7 +16,9 @@ import {
 import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
+//RUTAS AGREGADAS
 import products from '@/routes/products';
+import customers from '@/routes/customers';
 
 const mainNavItems: NavItem[] = [
     {
@@ -29,6 +31,11 @@ const mainNavItems: NavItem[] = [
         href: products.index.url(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Clientes',
+        href: customers.index.url(),
+        icon: LayoutGrid,
+    }
 ];
 
 const footerNavItems: NavItem[] = [
