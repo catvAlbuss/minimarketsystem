@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ProviderController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -26,7 +28,8 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::resource('products', ProductsController::class); 
     Route::resource('products', ProductsController::class);
     Route::resource('customers', CustomerController::class);
-    // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
+    Route::resource('providers',ProviderController::class);
+    Route::resource('promotions', PromotionController::class);    // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
 });
 
 
