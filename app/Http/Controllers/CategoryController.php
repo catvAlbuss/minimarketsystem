@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Inertia\Inertia;
 class CategoryController extends Controller
 {
     /**
@@ -13,6 +13,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        $category = Category::all();
+        return Inertia::render('categories/index', [
+            'categories' => $category,
+        ]);
         //
     }
 
@@ -29,6 +33,17 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
+        ]);
+
+        Category::create([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+        ]);
+
+        return to_route('categories.index');
         //
     }
 
@@ -51,16 +66,34 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, String $categoryid)
     {
+        $category = Category::query()->findOrFail($categoryid);
+
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        $payload =[
+            'name'=>$validatedData['name'],
+            'description'=>$validatedData['description'],
+        ];
+
+        $category->update($payload);
+        return to_route('categories.index');
         //
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Category $category)
+
+    public function destroy(Category $category, String $categoryid)
     {
-        //
+        $categories = Category::query()->findOrFail($categoryid);
+            
+        $categories->delete();
+        return to_route('customers.index');
     }
 }

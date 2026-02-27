@@ -15,13 +15,23 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_customers')->references('id')->on('customers')->onDelete('cascade');
             $table->foreignId('id_users')->references('id')->on('users')->onDelete('cascade');
+
+            $table->string('voucher_number')->unique();
+            $table->decimal('igv', 5, 4)->default(0.18);
+            $table->decimal('total', 10, 2);
+            $table->enum('payment_method', ['cash', 'card', 'yape', 'plin']);
+            $table->enum('voucher', ['ticket', 'invoice']);
+            $table->string('document');
+            $table->timestamp('date_time')->useCurrent();
+
             $table->string('voucher_number');
-            $table->decimal('igv',10,2)->default(0.18);
+            $table->decimal('igv', 10, 2)->default(0.18);
             $table->decimal('total');
-            $table->enum('payment_method',['cash','card','yape', 'plin']);
-            $table->enum('voucher',['ticket', 'invoice']);
+            $table->enum('payment_method', ['cash', 'card', 'yape', 'plin']);
+            $table->enum('voucher', ['ticket', 'invoice']);
             $table->string('document');
             $table->timestamp('date_time');
+
             $table->timestamps();
         });
     }

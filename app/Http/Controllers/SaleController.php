@@ -4,7 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Http\Controllers\Controller;
+
+use App\Models\Customer;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+
+// use Illuminate\Http\Request;
+
 
 class SaleController extends Controller
 {
@@ -13,7 +20,19 @@ class SaleController extends Controller
      */
     public function index()
     {
+
+        $sales = Sale::all();
+        $customers = Customer::all();
+        $users = User::all();
+        return Inertia::render('sales/index', [
+            'sales' => $sales,
+            'customers' => $customers,
+            'users' => $users,
+        ]);
+
+
         //
+
     }
 
     /**

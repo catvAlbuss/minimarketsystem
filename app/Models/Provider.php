@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Provider extends Model
 {
+
+    //
+
     protected $fillable = [
         'id_products',
         'ruc',
@@ -19,8 +22,8 @@ class Provider extends Model
         'status'
     ];
 
-    public function products(){
+    public function products()
+    {
         return $this->belongsTo(Products::class, 'id_products');
     }
-
 }

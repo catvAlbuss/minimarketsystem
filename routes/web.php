@@ -1,8 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ProviderController;
 use Illuminate\Support\Facades\Route;
@@ -25,9 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     })->name('dashboard');
 
     Route::resource('users', UserController::class);
-    Route::resource('products', ProductsController::class); 
     Route::resource('products', ProductsController::class);
     Route::resource('customers', CustomerController::class);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('sales',SaleController::class);
+    // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
     Route::resource('providers',ProviderController::class);
     Route::resource('promotions', PromotionController::class);    // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
 });
