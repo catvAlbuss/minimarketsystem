@@ -10,6 +10,7 @@ import { provide, ref } from 'vue';
 import { computed } from 'vue';
 import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
 import InputError from '@/components/InputError.vue';
+import promotions from '@/routes/promotions';
 
 type Promotion = {
     id: number;
@@ -19,19 +20,19 @@ type Promotion = {
     state: string;
 };
 
-type AddProducts ={
-    id: number,
-    name: string,
-    unit_price: number,
-    promotion_discount: number,
-    price_discount: number
+type AddProducts = {
+    id: number;
+    name: string;
+    unit_price: number;
+    promotion_discount: number;
+    price_discount: number;
 };
 
 type Products = {
-    id: number,
-    name: string,
-    unit_price: number,
-    promotion_discount: number,
+    id: number;
+    name: string;
+    unit_price: number;
+    promotion_discount: number;
 };
 
 type Props = {
@@ -40,14 +41,12 @@ type Props = {
 };
 
 const AddProduct = ref<AddProducts[]>([]);
-// const price = ref<number>();
-const price = computed(()=>{
-    return AddProduct.value.reduce((price,item) => price + item.unit_price, 0);
-});
+const promotionName = ref('');
+const state = ref('');
 
 const props = defineProps<Props>();
 const promotion = computed(() => props.promotions);
-const product = computed(()=> props.products);
+const product = computed(() => props.products);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -59,71 +58,115 @@ const breadcrumbs: BreadcrumbItem[] = [
 const editingId = ref<number | null>(null);
 const isEditing = computed(() => editingId.value !== null);
 
-const form = useForm({
-    id_products: 0,
-    name_promotion: '',
-    price: 0,
-    state: ''
-});
+// const form = useForm({
+//     id_products: 0,
+//     name_promotion: '',
+//     price: 0,
+//     state: '',
+// });
 
 const deleteForm = useForm({});
 const deleteError = computed(
     () => (deleteForm.errors as Record<string, string | undefined>).delete,
 );
 
+// const resetForm = (): void => {
+//     editingId.value = null;
+//     form.reset();
+// };
 
-const resetForm = (): void => {
-    editingId.value = null;
-    form.reset();
-};
+// const submit = (): void => {
+//     const option = {
+//         preserveScroll: true,
+//         onSuccess: () => resetForm(),
+//     };
+//     const box = JSON.stringify(form);
+//     console.log('Desde la condicion: ', box);
+//     if (isEditing.value && editingId.value !== null) {
+//         // console.log(form)
+//         const box = JSON.stringify(form);
+//         console.log('Desde la condicion: ', box);
+//         form.put(ProviderController.update.url(editingId.value), option);
+//         return;
+//     }
 
-const submit = (): void => {
-    const option = {
-        preserveScroll: true,
-        onSuccess: () => resetForm(),
-    };
-    const box = JSON.stringify(form);
-    console.log('Desde la condicion: ', box);
-    if (isEditing.value && editingId.value !== null) {
-        // console.log(form)
-        const box = JSON.stringify(form);
-        console.log('Desde la condicion: ', box);
-        form.put(ProviderController.update.url(editingId.value), option);
-        return;
-    }
+//     form.post(ProviderController.store.url(), option);
+// };
 
-    form.post(ProviderController.store.url(), option);
-};
+// const startEdit = (provider: Promotion): void => {
+//     editingId.value = provider.id;
+//     form.clearErrors();
+//     form.name_promotion = provider.name_promotion;
+//     form.price = provider.price;
+//     form.state = provider.state;
+// };
 
-const startEdit = (provider: Promotion): void => {
-    editingId.value = provider.id;
-    form.clearErrors();
-    form.name_promotion = provider.name_promotion;
-    form.price = provider.price;
-    form.state = provider.state;
-};
+// const remove = (promotion: Promotion): void => {
+//     if (!confirm(`Eliminar usuario "${promotion.name_promotion}"?`)) {
+//         return;
+//     }
 
-const remove = (promotion: Promotion): void => {
-    if (!confirm(`Eliminar usuario "${promotion.name_promotion}"?`)) {
-        return;
-    }
+//     deleteForm.delete(ProviderController.destroy.url(promotion.id), {
+//         preserveScroll: true,
+//     });
+// };
 
-    deleteForm.delete(ProviderController.destroy.url(promotion.id), {
-        preserveScroll: true,
-    });
-};
+const total = computed(() => {
+    return AddProduct.value.reduce(
+        (suma, item) => (suma = suma + (item.unit_price - item.price_discount)),
+        0,
+    );
+});
 
-const addProduct = (product: Products) =>{
-    const existItem = AddProduct.value.find(item=>item.id = product.id)
+const addProduct = (product: Products) => {
+    const calculateDiscount =
+        product.unit_price * (product.promotion_discount / 100);
 
-    const newItem: AddProducts ={
-        id: product.id,  
+    const newItem: AddProducts = {
+        id: product.id,
         name: product.name,
-        unit_price: 2,
-        promotion_discount: 2,
-        price_discount: 3
+        unit_price: product.unit_price,
+        promotion_discount: product.promotion_discount,
+        price_discount: Number(calculateDiscount.toFixed(2)),
     };
     AddProduct.value.push(newItem);
+};
+
+//removemos un producto de la const AddProduct
+const removeProduct = (index: number) => {
+    AddProduct.value.splice(index, 1);
+};
+
+//Crea un conjunto con todos los IDs que ya están en AddProduct
+const selectedIds = computed(() => {
+    return new Set(AddProduct.value.map((item) => item.id));
+});
+
+const crearPromotion = async () => {
+    if (AddProduct.value.length === 0) {
+        alert('Selecciona un producto');
+        return;
+    }
+
+    if (!confirm('¿Confirmar la venta?')) {
+        return;
+    }
+
+    const data = {
+        item: AddProduct.value.map((item) => ({
+            id: item.id,
+        })),
+        name_promotion: promotionName.value,
+        price: total.value,
+        state: state.value,
+    };
+
+    const box = JSON.stringify(data);
+    console.log(box);
+
+    router.post('/promotions', data);
+
+    //  AddProduct.value = [];
 };
 
 // const autocompletDescription=()=> {
@@ -137,11 +180,12 @@ const addProduct = (product: Products) =>{
 </script>
 
 <template>
-
     <Head title="Promociones" />
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="space-y-6 p-4">
-            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
+            <section
+                class="rounded-xl border border-sidebar-border/70 bg-background p-4"
+            >
                 <h1 class="text-xl font-semibold">
                     {{ isEditing ? 'Editar Promocion' : 'Nuevo Promocion' }}
                 </h1>
@@ -149,44 +193,60 @@ const addProduct = (product: Products) =>{
                     Gestiona todas las promociones de esta vista.
                 </p>
                 <table class="w-full min-w-[720px] text-sm">
-                        <thead class="border-b text-left">
-                            <tr>
-                                <th class="px-2 py-2">ID</th>
-                                <th class="px-2 py-2">Nombre de Promocion</th>
-                                <th class="px-2 py-2">Precio</th>
-                                <th class="px-2 py-2">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-if="product.length === 0">
-                                <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
-                                    No hay promociones registrados.
-                                </td>
-                            </tr>
-                            <tr v-for="prom in promotion" :key="prom.id" class="border-b">
-                                <td class="px-2 py-2">{{ prom.id }}</td>
-                                <td class="px-2 py-2">
-                                    {{ prom.name_promotion }}
-                                </td>
-                                <td class="px-2 py-2">{{ prom.price }}</td>
-                                <td class="px-2 py-2">{{ prom.state }}</td>
-                                <td class="px-2 py-2">
-                                    <div class="flex gap-2">
-                                        <!-- <Button type="button" variant="secondary" size="sm" :disabled="form.processing ||
+                    <thead class="border-b text-left">
+                        <tr>
+                            <th class="px-2 py-2">Id Producto</th>
+                            <th class="px-2 py-2">Nombre de Promocion</th>
+                            <th class="px-2 py-2">Precio</th>
+                            <th class="px-2 py-2">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="product.length === 0">
+                            <td
+                                colspan="6"
+                                class="px-2 py-4 text-center text-muted-foreground"
+                            >
+                                No hay promociones registrados.
+                            </td>
+                        </tr>
+                        <tr
+                            v-for="prom in promotion"
+                            :key="prom.id"
+                            class="border-b"
+                        >
+                            <td class="px-2 py-2">{{ prom.id_products }}</td>
+                            <td class="px-2 py-2">
+                                {{ prom.name_promotion }}
+                            </td>
+                            <td class="px-2 py-2">{{ prom.price }}</td>
+                            <td class="px-2 py-2">{{ prom.state }}</td>
+                            <td class="px-2 py-2">
+                                <div class="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        @click=""
+                                    >
+                                        Editar
+                                    </Button>
+                                    <!-- :disabled="form.processing ||
                                             deleteForm.processing
-                                            " @click="startEdit(prov)">
-                                            Editar
-                                        </Button> -->
-                                        <!-- <Button type="button" variant="destructive" size="sm" :disabled="form.processing ||
-                                            deleteForm.processing
-                                            " @click="remove(prov)">
-                                            Eliminar
-                                        </Button> -->
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                            " -->
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        @click=""
+                                    >
+                                        Eliminar
+                                    </Button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <!-- <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
                     <div class="grid gap-2">
                         <Label for="name_promotion">Nombre de la promocion</Label>
@@ -258,57 +318,188 @@ const addProduct = (product: Products) =>{
                     </div>
                 </form> -->
             </section>
-            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
-                <h2 class="text-lg font-semibold">Listado de Productos</h2>
+            <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+                <section
+                    class="rounded-xl border border-sidebar-border/70 bg-background p-4"
+                >
+                    <h2 class="text-lg font-semibold">Listado de Productos</h2>
 
-                <div class="mt-4 overflow-x-auto">
-                    <table class="w-full min-w-[720px] text-sm">
-                        <thead class="border-b text-left">
-                            <tr>
-                                <th class="px-2 py-2">ID</th>
-                                <th class="px-2 py-2">Nombre Producto</th>
-                                <th class="px-2 py-2">P/U</th>
-                                <th class="px-2 py-2">Descuento %</th>
-                                <th class="px-2 py-2">Accion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-if="product.length === 0">
-                                <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
-                                    No hay productos registrados.
-                                </td>
-                            </tr>
-                            <tr v-for="prod in product" :key="prod.id" class="border-b">
-                                <td class="px-2 py-2">{{ prod.id }}</td>
-                                <td class="px-2 py-2">
-                                    {{ prod.name }}
-                                </td>
-                                <td class="px-2 py-2">{{ prod.unit_price }}</td>
-                                <td class="px-2 py-2">{{ prod.promotion_discount }}</td>
-                                <td class="px-2 py-2">
-                                    <div class="flex gap-2">
-
-                                        <Button type="button" variant="secondary" @click.stop="addProduct(prod)">
+                    <div class="mt-4 overflow-x-auto">
+                        <table class="w-full min-w-auto text-sm">
+                            <thead class="border-b text-left">
+                                <tr>
+                                    <th class="px-2 py-2">ID</th>
+                                    <th class="px-2 py-2">Nombre Producto</th>
+                                    <th class="px-2 py-2">P/U</th>
+                                    <th class="px-2 py-2">Descuento %</th>
+                                    <th class="px-2 py-2">Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="product.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-2 py-4 text-center text-muted-foreground"
+                                    >
+                                        No hay productos registrados.
+                                    </td>
+                                </tr>
+                                <tr
+                                    v-for="prod in product"
+                                    :key="prod.id"
+                                    class="border-b"
+                                >
+                                    <td class="px-2 py-2">{{ prod.id }}</td>
+                                    <td class="px-2 py-2">
+                                        {{ prod.name }}
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        {{ prod.unit_price }}
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        {{ prod.promotion_discount }}
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        <div class="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                @click.stop="addProduct(prod)"
+                                                :disabled="
+                                                    selectedIds.has(prod.id)
+                                                "
+                                            >
                                                 Agregar
                                             </Button>
-                                        <!-- <Button type="button" variant="secondary" size="sm" :disabled="form.processing ||
+                                            <!-- <Button type="button" variant="secondary" size="sm" :disabled="form.processing ||
                                             deleteForm.processing
                                             " @click="startEdit(prov)">
                                             Editar
                                         </Button> -->
-                                        <!-- <Button type="button" variant="destructive" size="sm" :disabled="form.processing ||
+                                            <!-- <Button type="button" variant="destructive" size="sm" :disabled="form.processing ||
                                             deleteForm.processing
                                             " @click="remove(prov)">
                                             Eliminar
                                         </Button> -->
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- <InputError :message="deleteError" class="mt-3" /> -->
-            </section>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <InputError :message="deleteError" class="mt-3" /> -->
+                </section>
+
+                <!-- Apartado de  -->
+                <section
+                    class="rounded-xl border border-sidebar-border/70 bg-background p-4"
+                >
+                    <h2 class="text-lg font-semibold">Crea tus combos</h2>
+
+                    <div class="mb-4 flex-1 overflow-y-auto">
+                        <table class="w-full min-w-auto text-sm">
+                            <thead class="border-b text-left">
+                                <tr>
+                                    <th class="px-2 py-2">ID</th>
+                                    <th class="px-2 py-2">Nombre Producto</th>
+                                    <th class="px-2 py-2">P/U</th>
+                                    <th class="px-2 py-2">Descuento</th>
+                                    <th class="px-2 py-2">Desc/Precio</th>
+                                    <th class="px-2 py-2">Accion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="product.length === 0">
+                                    <td
+                                        colspan="6"
+                                        class="px-2 py-4 text-center text-muted-foreground"
+                                    >
+                                        No hay productos registrados.
+                                    </td>
+                                </tr>
+                                <tr
+                                    v-for="(item, index) in AddProduct"
+                                    :key="index"
+                                    class="border-b"
+                                >
+                                    <td class="px-2 py-2">{{ item.id }}</td>
+                                    <td class="px-2 py-2">
+                                        {{ item.name }}
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        {{ item.unit_price }}
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        {{ item.promotion_discount }}%
+                                    </td>
+                                    <td class="px-2 py-2">
+                                        {{ item.price_discount }}
+                                    </td>
+                                    <td class="px-4 py-3 text-sm">
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            @click.stop="removeProduct(index)"
+                                        >
+                                            Eliminar
+                                        </Button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mb-2 flex-1 overflow-y-auto">
+                        <div class="mb-2 flex flex-col gap-2">
+                            <label class="text-sm font-bold text-white"
+                                >Nombre de la Promoción:</label
+                            >
+                            <input
+                                v-model="promotionName"
+                                type="text"
+                                placeholder="Ej: Promo Verano, 2x1..."
+                                class="rounded-lg border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+                    </div>
+                    <div class="mb-4 flex gap-4 overflow-y-auto">
+                        <div class="mb-4 flex flex-col gap-2">
+                            <label class="text-md font-bold text-white"
+                                >TOTAL</label
+                            >
+                            <input
+                                v-model="total"
+                                disabled
+                                type="text"
+                                placeholder="Ej: Promo Verano, 2x1..."
+                                class="rounded-lg border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="id_products">Estado</Label>
+                            <select
+                                id="id_products"
+                                v-model="state"
+                                required
+                                class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                            >
+                                <option value="" disabled selected>
+                                    Tipo de producto
+                                </option>
+                                <option :value="'active'">Activo</option>
+                                <option :value="'inactive'">Inactivo</option>
+                            </select>
+                            <!-- <InputError :message="form.errors.id_products" /> -->
+                        </div>
+                        <div class="item-center">
+                            <Button @click="crearPromotion" type="submit"
+                                >Agregar Promocion
+                                <i class="fas fa-plus"></i>
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
     </AppLayout>
 </template>
