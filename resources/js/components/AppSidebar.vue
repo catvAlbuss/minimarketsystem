@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+
 import { BookOpen, Folder, LayoutGrid, User } from 'lucide-vue-next';
+
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
@@ -17,15 +19,16 @@ import {
 import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
+
+// IMPORTAR RUTAS
 import products from '@/routes/products';
 
 import users from '@/routes/users';
 import customers from '@/routes/customers';
+import categories from '@/routes/categories';
+import sales from '@/routes/sales';
 import providers from '@/routes/providers';
 import promotions from '@/routes/promotions';
-
-//import categories from '@/routes/categories';
-
 
 const mainNavItems: NavItem[] = [
     {
@@ -39,7 +42,7 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Products',
+        title: 'Productos',
         href: products.index.url(),
         icon: LayoutGrid,
     },
@@ -47,18 +50,33 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Sucursales',
         href: branches.index.url(),
+    },
+    {
+        title: 'Ventas',
+        href: sales.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Categorías',
+        href: categories.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Clientes',
+        href: customers.index.url(),
         icon: LayoutGrid,
     },
     {
         title: 'Proveedores',
         href: providers.index.url(),
-        icon: User,
+        icon: LayoutGrid,
     },
     {
         title: 'Promociones',
         href: promotions.index.url(),
         icon: LayoutGrid,
-    }
+
+    },
 ];
 
 </script>

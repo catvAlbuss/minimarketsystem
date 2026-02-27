@@ -12,4 +12,9 @@ class Category extends Model
          "name",
          "description",
     ] ;
+
+    protected $fillable = [
+        'name',
+        'description',
+    ];
 }

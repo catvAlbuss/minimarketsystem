@@ -4,7 +4,10 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { ref, computed } from 'vue';
 import UserController from '@/actions/App/Http/Controllers/UserController';
+
+
 import InputError from '@/components/InputError.vue';
+ 
 
 type Users = {
     id: number;
@@ -168,6 +171,62 @@ const disabledClass = 'w-full rounded-lg border border-gray-200 bg-gray-50 px-3 
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="p-6 md:p-8 bg-gray-50 min-h-screen space-y-6">
+        <div class="space-y-6 p-4">
+            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
+                <h1 class="text-xl font-semibold">
+                    {{ isEditing ? 'Editar usuario' : 'Nuevo usuario' }}
+                </h1>
+                <p class="mt-1 text-sm text-muted-foreground">
+                    Gestiona usuarios, rol y personal desde esta misma vista.
+                </p>
+                <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
+                    <div class="grid gap-2">
+                        <Label for="name">Nombre</Label>
+                        <Input id="name" class="text-white" v-model="form.name" type="text" required placeholder="Ej: Jorge"/>
+                        <InputError :message="form.errors.name" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="lastname">Apellido</Label>
+                        <Input id="lastname" v-model="form.lastname" type="text" required placeholder="Ej: Almeida" />
+ 
+                        <InputError :message="form.errors.name" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="dni">DNI</Label>
+                        <Input id="dni" v-model="form.dni" type="text" required/>
+                        <InputError :message="form.errors.name" />
+
+                        <InputError :message="form.errors.lastname" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="dni">DNI</Label>
+                        <Input :disabled="isEditing" id="dni" v-model="form.dni" type="text" required/>
+                        <InputError :message="form.errors.dni" />
+ 
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="phone">Celular</Label>
+                        <Input id="phone" v-model="form.phone" type="text" required />
+ 
+                        <InputError :message="form.errors.name" />
+
+                        <InputError :message="form.errors.phone" />
+ 
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="address">Direccion</Label>
+                        <Input id="address" v-model="form.address" type="text" required placeholder="Ej: Jr. 28 Julio"/>
+                        <InputError :message="form.errors.address" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="email">Correo</Label>
+ 
+                        <Input id="email" v-model="form.email" type="email" required placeholder="Ej: example@gmail.com"/>
+
+                        <Input :disabled="isEditing" id="email" v-model="form.email" type="email" required placeholder="Ej: example@gmail.com"/>
+ 
+                        <InputError :message="form.errors.email" />
+                    </div>
 
             <!-- ── Header ── -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-xl shadow-sm border border-gray-100 px-6 py-5">

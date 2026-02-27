@@ -8,9 +8,9 @@ import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { provide, ref } from 'vue';
 import { computed } from 'vue';
-import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
+// import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
 import InputError from '@/components/InputError.vue';
-import promotions from '@/routes/promotions';
+// import promotions from '@/routes/promotions';
 
 type Promotion = {
     id: number;

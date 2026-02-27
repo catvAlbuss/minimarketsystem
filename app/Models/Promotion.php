@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Promotion extends Model
 {
     //
+
+
     protected $fillable = [
         'id_products',
         'name_promotion',
@@ -14,7 +16,8 @@ class Promotion extends Model
         'state'
     ];
 
-    public function products (){
+    public function products()
+    {
         return $this->belongsTo(Products::class, 'id_products');
     }
 }

@@ -5,12 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
 class CategoryController extends Controller
 {
     public function index()
     {
+
         $categories = Category::orderBy('name')->get();
+        $category = Category::all();
+        return Inertia::render('categories/index', [
+            'categories' => $category,
+        ]);
+        //
+    }
 
         return Inertia::render('categories/index', [
             'categories' => $categories,
@@ -23,28 +29,50 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string|max:500',
         ]);
-
-        Category::create($validated);
-
-        return redirect()->back()->with('success', 'Categoría creada.');
-    }
-
-    public function update(Request $request, Category $category)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
-            'description' => 'nullable|string|max:500',
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string|max:500',
         ]);
 
-        $category->update($validated);
+        Category::create([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+        ]);
 
-        return redirect()->back()->with('success', 'Categoría actualizada.');
+        return to_route('categories.index');
     }
 
-    public function destroy(Category $category)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, String $categoryid)
     {
-        $category->delete();
+        $category = Category::query()->findOrFail($categoryid);
 
-        return redirect()->back()->with('success', 'Categoría eliminada.');
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+        ]);
+
+        $payload =[
+            'name'=>$validatedData['name'],
+            'description'=>$validatedData['description'],
+        ];
+
+        $category->update($payload);
+        return to_route('categories.index');
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+
+    public function destroy(Category $category, String $categoryid)
+    {
+        $categories = Category::query()->findOrFail($categoryid);
+            
+        $categories->delete();
+        return to_route('customers.index');
     }
 }

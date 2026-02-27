@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Promotion;
 use App\Http\Controllers\Controller;
-use App\Models\Products;
+
 use Illuminate\Http\Request;
+use App\Models\Products;
+// use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 
 class PromotionController extends Controller
 {
@@ -16,13 +19,14 @@ class PromotionController extends Controller
     public function index()
     {
         //
+
+
         $promotions = Promotion::all();
-        $products = Products::select('id','name','unit_price','promotion_discount')->get();
-        return Inertia::render('promotions/index',[
-            'promotions' =>$promotions,
+        $products = Products::select('id', 'name', 'unit_price', 'promotion_discount')->get();
+        return Inertia::render('promotions/index', [
+            'promotions' => $promotions,
             'products' => $products,
         ]);
-
     }
 
     /**
@@ -39,7 +43,9 @@ class PromotionController extends Controller
     public function store(Request $request)
     {
         //
-        foreach($request->item as $item){
+
+
+        foreach ($request->item as $item) {
             Promotion::create([
                 'id_products' => $item['id'],
                 'name_promotion' => $request['name_promotion'],
