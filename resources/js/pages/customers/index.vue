@@ -203,7 +203,7 @@ const remove = (customer: Customer): void => {
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="form-control text-black" id="buscarCliente"
+                                    <input type="text" class="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"" id="buscarCliente"
                                         placeholder="Buscar por nombre, DNI o WhatsApp..." onkeyup="filtrarClientes()">
                                 </div>
                             </div>
