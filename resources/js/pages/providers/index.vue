@@ -368,6 +368,8 @@ const categoryLabel = (cat: string) => ({
                         </tbody>
                     </table>
                 </div>
+                <InputError :message="deleteError" class="mt-3" />
+            </section>
             </div>
         </div>
     </AppLayout>
