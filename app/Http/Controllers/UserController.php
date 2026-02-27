@@ -27,8 +27,8 @@ class UserController extends Controller
         $validate = $request->validate([
             'name'=>['required','string','max:250'],
             'lastname'=>['required','string','max:250'],
-            'dni'=>['required', 'integer'],
-            'phone'=>['required', 'integer'],
+            'dni'=>['required', 'integer','digits:8'],
+            'phone'=>['required', 'integer', 'digits:9'],
             'address'=>['required', 'string'],
             'email'=>['required', 'string', 'email', 'unique:users,email'],
             'password'=>['required', 'string', 'min: 8','confirmed'],

@@ -3,64 +3,72 @@
 namespace App\Http\Controllers;
 
 use App\Models\Branch;
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class BranchController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Lista las sucursales.
      */
-    public function index()
+    public function index(): Response
     {
-        //
+        // Cargamos también el usuario encargado para mostrarlo si es necesario
+        $branches = Branch::with('user')->get(); 
+        
+        return Inertia::render('branches/index', [
+            'branches' => $branches,
+            // Enviamos los usuarios para el selector al crear/editar
+            'users' => User::all(['id', 'name']) 
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Guarda una nueva sucursal.
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'id_users'     => 'required|exists:users,id',
+            'name'         => 'required|string|max:255',
+            'address'      => 'required|string',
+            'opening_time' => 'required',
+            'closing_time' => 'required',
+            'state'        => 'required|in:active,inactive',
+        ]);
+
+        Branch::create($validated);
+
+        return redirect()->back()->with('message', 'Sucursal creada con éxito');
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Branch $branch)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Branch $branch)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Actualiza una sucursal existente.
      */
     public function update(Request $request, Branch $branch)
     {
-        //
+        $validated = $request->validate([
+            'id_users'     => 'required|exists:users,id',
+            'name'         => 'required|string|max:255',
+            'address'      => 'required|string',
+            'opening_time' => 'required',
+            'closing_time' => 'required',
+            'state'        => 'required|in:active,inactive',
+        ]);
+
+        $branch->update($validated);
+
+        return redirect()->back()->with('message', 'Sucursal actualizada');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina una sucursal.
      */
     public function destroy(Branch $branch)
     {
-        //
+        $branch->delete();
+        return redirect()->back()->with('message', 'Sucursal eliminada');
     }
 }

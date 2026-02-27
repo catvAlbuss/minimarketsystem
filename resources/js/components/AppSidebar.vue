@@ -4,6 +4,7 @@ import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import branches from '@/routes/branches';
 import {
     Sidebar,
     SidebarContent,
@@ -17,8 +18,12 @@ import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
 import products from '@/routes/products';
+
 import users from '@/routes/users';
 import customers from '@/routes/customers';
+
+//import categories from '@/routes/categories';
+
 
 const mainNavItems: NavItem[] = [
     {
@@ -36,12 +41,21 @@ const mainNavItems: NavItem[] = [
         href: products.index.url(),
         icon: LayoutGrid,
     },
+
     {
-        title: 'Clientes',
-        href: customers.index.url(),
+        title: 'Sucursales',
+        href: branches.index.url(),
         icon: LayoutGrid,
-    }
+    },
+    //{
+        //title: 'Categorías',
+        //href: categories.index.url(),
+        //icon: LayoutGrid,
+    //}
+    
+
 ];
+
 </script>
 
 <template>
