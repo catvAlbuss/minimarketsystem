@@ -1,60 +1,39 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
 import { computed, ref } from 'vue';
-import CustomerController from '@/actions/App/Http/Controllers/CustomerController';
+import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import InputError from '@/components/InputError.vue';
-
-
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Clientes',
-        href: './customers',
+        title: 'Categorias',
+        href: './categories',
     },
 ];
 
-type Customer = {
+type Category = {
     id: number;
-    dni: string;
     name: string;
-
-    last_name: string;
-    birthday: string;
-    email: string;
-    phone: string;
-    address: string;
-
-    score: number;
-    state: string;
+    description: string;
 };
 
 type props = {
-    customers: Customer[];
+    categories: Category[];
 };
 
 const props = defineProps<props>();
-const customer = computed(() => props.customers);
-
+const categories = computed(() => props.categories);
 
 const editingId = ref<number | null>(null);
 
 const form = useForm({
-    dni: '',
-    name: '',
-    last_name: '',
-    birthday: '',
-    email: '',
-    phone: '',
-    address: '',
-    score: 0,
-    state: 'active',
+    name:'',
+    description:'',
 });
 
 
@@ -69,18 +48,11 @@ const resetForm = (): void => {
     deleteForm.reset();
 };
 
-const startEdit = (customer: Customer): void => {
-    editingId.value = customer.id;
+const startEdit = (categories: Category): void => {
+    editingId.value = categories.id;
     form.clearErrors();
-    form.dni = customer.dni;
-    form.name = customer.name;
-    form.last_name = customer.last_name;
-    form.birthday = customer.birthday;
-    form.email = customer.email;
-    form.phone = customer.phone;
-    form.address = customer.address;
-    form.score = customer.score;
-    form.state = customer.state;
+    form.name =  categories.name;
+    form.description = categories.description;
 };
 
 const submit = (): void => {
@@ -91,40 +63,21 @@ const submit = (): void => {
         onSuccess: () => resetForm(),
     };
     if (isEditing.value && editingId.value !== null) {
-        form.put(CustomerController.update.url(editingId.value), options);
+        form.put(CategoryController.update.url(editingId.value), options);
         return;
     }
-    form.post(CustomerController.store.url(), options);
+    form.post(CategoryController.store.url(), options);
 };
 
-const remove = (customer: Customer): void => {
-    if (!confirm(`Eliminar cliente "${customer.name}"?`)) {
+const remove = (categories: Category): void => {
+    if (!confirm(`Eliminar cliente "${categories.name}"?`)) {
         return;
     }
 
-    deleteForm.delete(CustomerController.destroy.url(customer.id), {
+    deleteForm.delete(CategoryController.destroy.url(categories.id), {
         preserveScroll: true,
     });
 };
-
-
-// const form = useForm({
-//     id: null,
-//     nombre: '',
-//     dni: '',
-//     whatsapp: '',
-//     email: '',
-//     direccion: '',
-//     cumpleanos: '',
-//     puntos: 0,
-//     preferencia: 'Sin preferencia',
-//     estado: 'Normal',
-// });
-
-// const deleteForm = useForm({});
-// const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
-
-
 </script>
 
 <template class="bg-gray-100" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#1f2937;">
@@ -132,27 +85,6 @@ const remove = (customer: Customer): void => {
     <Head title="Customers" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-
-        <!-- <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div
-                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <PlaceholderPattern />
-            </div>
-        </div> -->
 
         <!-- Main Content -->
         <main class="main-tw min-h-screen bg-gray-100 transition-all duration-300">
@@ -203,7 +135,7 @@ const remove = (customer: Customer): void => {
                             <div class="col-md-6">
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"" id="buscarCliente"
+                                    <input type="text" class="form-control text-black" id="buscarCliente"
                                         placeholder="Buscar por nombre, DNI o WhatsApp..." onkeyup="filtrarClientes()">
                                 </div>
                             </div>
@@ -233,83 +165,29 @@ const remove = (customer: Customer): void => {
                     </div>
                 </div>
 
-
             </section>
 
             <!-- CREAR CLIENTES -->
             <section class="border border-sidebar-border/70 bg-background p-4">
                 <h1 class="text-xl font-semibold">
-                    {{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}
+                    {{ isEditing ? 'Editar categoría' : 'Nueva categoría' }}
                 </h1>
                 <p class="mt-1 text-sm text-muted-foreground">
-                    Gestiona clientes desde esta misma vista.
+                    Gestiona las categorias desde esta misma vista.
                 </p>
 
                 <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
                     <!-- CAMPO NOMBRE -->
                     <div class="grid gap-2">
-                        <Label for="nombre">Nombre</Label>
-                        <Input id="nombre" v-model="form.name" type="text" placeholder="Ej: Juan Pérez" required />
+                        <Label for="name">Nombre</Label>
+                        <Input id="name" v-model="form.name" type="text" placeholder="Ej: Lácteos" required />
                         <InputError :message="form.errors.name" />
                     </div>
-                    <!-- CAMPO APELLIDO -->
+                    <!-- CAMPO DESCRIPCIÓN -->
                     <div class="grid gap-2">
-                        <Label for="apellido">Apellido</Label>
-                        <Input id="apellido" v-model="form.last_name" type="text" placeholder="Ej: Pérez" required />
-                        <InputError :message="form.errors.last_name" />
-                    </div>
-                    <!-- CAMPO DNI -->
-                    <div class="grid gap-2">
-                        <Label for="dni">DNI</Label>
-                        <Input id="dni" v-model="form.dni" type="text" placeholder="Ej: 12345678" required
-                            :readonly="isEditing" />
-                        <InputError :message="form.errors.dni" />
-                    </div>
-                    <!-- CAMPO CELULAR -->
-                    <div class="grid gap-2">
-                        <Label for="celular">Celular</Label>
-                        <Input id="celular" v-model="form.phone" type="text" placeholder="Ej: 987654321" required />
-                        <InputError :message="form.errors.phone" />
-                    </div>
-                    <!-- CAMPO EMAIL -->
-                    <div class="grid gap-2">
-                        <Label for="email">Email</Label>
-                        <Input id="email" v-model="form.email" type="email" placeholder="Ej: juan@ejemplo.com" required
-                            :readonly="isEditing" />
-                        <InputError :message="form.errors.email" />
-                    </div>
-                    <!-- CAMPO DIRECCION -->
-                    <div class="grid gap-2">
-                        <Label for="direccion">Dirección</Label>
-                        <Input id="direccion" v-model="form.address" type="text" placeholder="Ej: Av. Principal 123" />
-                        <InputError :message="form.errors.address" />
-                    </div>
-                    <!-- CAMPO CUMPLEAÑOS -->
-                    <div class="grid gap-2">
-                        <Label for="cumpleanos">Cumpleaños</Label>
-                        <Input class="[color-scheme:dark]" id="cumpleanos" v-model="form.birthday" type="date"
-                            placeholder="Ej: 1990-01-01" />
-                        <InputError :message="form.errors.birthday" />
-                    </div>
-                    <!-- CAMPO SCORE -->
-                    <div class="grid gap-2">
-                        <Label for="puntos">Puntos</Label>
-                        <Input class="[color-scheme:dark]" id="puntos" v-model="form.score" type="number"
-                            placeholder="Ej: 100" />
-                        <InputError :message="form.errors.score" />
-                    </div>
-                    <!-- CAMPO DE ESTADO: ACTIVO O INACTIVO -->
-                    <div class="grid gap-2">
-                        <Label for="estado">Estado</Label>
-                        <select id="estado" v-model="form.state" required placeholder="Ej: Activo o Inactivo"
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <!-- <option v-for="estado in form.state" :key="estado" :value="estado">
-                                {{ estado }}
-                            </option> -->
-                            <option value="active">Activo</option>
-                            <option value="inactive">Inactivo</option>
-                        </select>
-                        <InputError :message="form.errors.state" />
+                        <Label for="description">Descripción</Label>
+                        <Input id="description" v-model="form.description" type="text" placeholder="Ej: Descripción" required />
+                        <InputError :message="form.errors.description" />
                     </div>
 
                     <!-- <div class="grid gap-2">
@@ -338,23 +216,6 @@ const remove = (customer: Customer): void => {
                     </div>
 
                 </form>
-
-                <!-- MOSTRANDO CLIENTES -->
-
-                <!-- Botón Nuevo Cliente -->
-                <!-- <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary text-black bg-blue-500 rounded-lg p-2" data-bs-toggle="modal"
-                        data-bs-target="#modalCliente" onclick="prepararModalNuevoCliente()" >
-                        <i class="bi bi-person-plus"></i> Nuevo Cliente
-                    </button>
-                </div> -->
-
-                <!-- Tarjetas de Clientes -->
-                <!-- <div class="row g-4" id="contenedorTarjetasClientes"> -->
-                <!-- Se genera con JavaScript -->
-                <!-- </div> -->
-
-
             </section>
 
             <!-- MOSTRAR CLIENTES -->
@@ -366,76 +227,32 @@ const remove = (customer: Customer): void => {
                         <thead class="border-b text-left">
                             <tr>
                                 <th class="px-2 py-2">ID</th>
-
-                                <th class="px-2 py-2">Dni</th>
                                 <th class="px-2 py-2">Nombre</th>
-                                <th class="px-2 py-2">Apellido</th>
-
-                                <th class="px-2 py-2">Nombre</th>
-                                <th class="px-2 py-2">Dni</th>
-
-                                <th class="px-2 py-2">Whatsapp</th>
-                                <th class="px-2 py-2">Correo</th>
-                                <th class="px-2 py-2">Direccion</th>
-                                <th class="px-2 py-2">Cumpleaños</th>
-                                <th class="px-2 py-2">Puntos</th>
-
-
-                                <th class="px-2 py-2">Preferencia</th>
-
-                                <th class="px-2 py-2">Estado</th>
-                                <th class="px-2 py-2">Acciones</th>
+                                <th class="px-2 py-2">Descripción</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-if="customer.length === 0">
+                            <tr v-if="categories.length === 0">
                                 <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
                                     No hay usuarios registrados.
                                 </td>
                             </tr>
-                            <tr v-for="customers in customer" :key="customers.id" class="border-b">
-                                <td class="px-2 py-2">{{ customers.id }}</td>
-                                <td class="px-2 py-2">{{ customers.dni }}</td>
-                                <td class="px-2 py-2">{{ customers.name }}</td>
-                                <td class="px-2 py-2">{{ customers.last_name }}</td>
-
-                                <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.birthday }}</td>
-
-                                <td class="px-2 py-2">{{ customers.birthday }}</td>
-                                <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
-
-                                <td class="px-2 py-2">{{ customers.score ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.state ?? '-' }}</td>
+                            <tr v-for="category in categories" :key="category.id" class="border-b">
+                                <td class="px-2 py-2">{{ category.id }}</td>
+                                <td class="px-2 py-2">{{ category.name }}</td>
+                                <td class="px-2 py-2">{{ category.description }}</td>
                                 <td class="px-2 py-2">
                                     <div class="flex gap-2">
-
                                         <Button type="button" variant="secondary" size="sm"
                                             :disabled="form.processing || deleteForm.processing"
-                                            @click="startEdit(customers)">
+                                            @click="startEdit(category)">
                                             Editar
                                         </Button>
                                         <Button type="button" variant="destructive" size="sm"
                                             :disabled="form.processing || deleteForm.processing"
-                                            @click="remove(customers)">
+                                            @click="remove(category)">
                                             Eliminar
                                         </Button>
-
-                                        <!-- <Button type="button" variant="secondary" size="sm"
-                                                :disabled="form.processing || deleteForm.processing"
-                                                @click="startEdit(customers)">
-                                                Editar
-                                            </Button>
-                                            <Button type="button" variant="destructive" size="sm"
-                                                :disabled="form.processing || deleteForm.processing"
-                                                @click="remove(customers)">
-                                                Eliminar
-                                            </Button> -->
-
                                     </div>
                                 </td>
                             </tr>
