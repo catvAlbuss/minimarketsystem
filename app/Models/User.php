@@ -35,6 +35,7 @@ class User extends Authenticatable
         'entry_to_payroll',
         'role',
         'state'
+
     ];
 
     /**
@@ -63,3 +64,7 @@ class User extends Authenticatable
         ];
     }
 }
+
+
+
+
