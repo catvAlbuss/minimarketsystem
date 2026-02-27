@@ -8,6 +8,7 @@ import { type BreadcrumbItem } from '@/types';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import UserController from '@/actions/App/Http/Controllers/UserController';
+import InputError from '@/components/InputError.vue';
 
 type Users = {
     id: number,
@@ -145,17 +146,17 @@ const remove = (user: Users): void => {
                     <div class="grid gap-2">
                         <Label for="lastname">Apellido</Label>
                         <Input id="lastname" v-model="form.lastname" type="text" required placeholder="Ej: Almeida" />
-                        <InputError :message="form.errors.name" />
+                        <InputError :message="form.errors.lastname" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="dni">DNI</Label>
-                        <Input id="dni" v-model="form.dni" type="text" required/>
-                        <InputError :message="form.errors.name" />
+                        <Input :disabled="isEditing" id="dni" v-model="form.dni" type="text" required/>
+                        <InputError :message="form.errors.dni" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="phone">Celular</Label>
                         <Input id="phone" v-model="form.phone" type="text" required />
-                        <InputError :message="form.errors.name" />
+                        <InputError :message="form.errors.phone" />
                     </div>
                     <div class="grid gap-2">
                         <Label for="address">Direccion</Label>
@@ -164,7 +165,7 @@ const remove = (user: Users): void => {
                     </div>
                     <div class="grid gap-2">
                         <Label for="email">Correo</Label>
-                        <Input id="email" v-model="form.email" type="email" required placeholder="Ej: example@gmail.com"/>
+                        <Input :disabled="isEditing" id="email" v-model="form.email" type="email" required placeholder="Ej: example@gmail.com"/>
                         <InputError :message="form.errors.email" />
                     </div>
 
