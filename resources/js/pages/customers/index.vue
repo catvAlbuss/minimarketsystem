@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,9 @@ import { type BreadcrumbItem } from '@/types';
 import { computed, ref } from 'vue';
 import CustomerController from '@/actions/App/Http/Controllers/CustomerController';
 import InputError from '@/components/InputError.vue';
+
+
+
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,11 +24,13 @@ type Customer = {
     id: number;
     dni: string;
     name: string;
+
     last_name: string;
     birthday: string;
     email: string;
     phone: string;
     address: string;
+
     score: number;
     state: string;
 };
@@ -35,6 +41,7 @@ type props = {
 
 const props = defineProps<props>();
 const customer = computed(() => props.customers);
+
 
 const editingId = ref<number | null>(null);
 
@@ -99,6 +106,25 @@ const remove = (customer: Customer): void => {
         preserveScroll: true,
     });
 };
+
+
+// const form = useForm({
+//     id: null,
+//     nombre: '',
+//     dni: '',
+//     whatsapp: '',
+//     email: '',
+//     direccion: '',
+//     cumpleanos: '',
+//     puntos: 0,
+//     preferencia: 'Sin preferencia',
+//     estado: 'Normal',
+// });
+
+// const deleteForm = useForm({});
+// const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
+
+
 </script>
 
 <template class="bg-gray-100" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#1f2937;">
@@ -207,6 +233,7 @@ const remove = (customer: Customer): void => {
                     </div>
                 </div>
 
+
             </section>
 
             <!-- CREAR CLIENTES -->
@@ -247,7 +274,8 @@ const remove = (customer: Customer): void => {
                     <!-- CAMPO EMAIL -->
                     <div class="grid gap-2">
                         <Label for="email">Email</Label>
-                        <Input id="email" v-model="form.email" type="email" placeholder="Ej: juan@ejemplo.com" required :readonly="isEditing"/>
+                        <Input id="email" v-model="form.email" type="email" placeholder="Ej: juan@ejemplo.com" required
+                            :readonly="isEditing" />
                         <InputError :message="form.errors.email" />
                     </div>
                     <!-- CAMPO DIRECCION -->
@@ -310,6 +338,23 @@ const remove = (customer: Customer): void => {
                     </div>
 
                 </form>
+
+                <!-- MOSTRANDO CLIENTES -->
+
+                <!-- Botón Nuevo Cliente -->
+                <!-- <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary text-black bg-blue-500 rounded-lg p-2" data-bs-toggle="modal"
+                        data-bs-target="#modalCliente" onclick="prepararModalNuevoCliente()" >
+                        <i class="bi bi-person-plus"></i> Nuevo Cliente
+                    </button>
+                </div> -->
+
+                <!-- Tarjetas de Clientes -->
+                <!-- <div class="row g-4" id="contenedorTarjetasClientes"> -->
+                <!-- Se genera con JavaScript -->
+                <!-- </div> -->
+
+
             </section>
 
             <!-- MOSTRAR CLIENTES -->
@@ -321,14 +366,23 @@ const remove = (customer: Customer): void => {
                         <thead class="border-b text-left">
                             <tr>
                                 <th class="px-2 py-2">ID</th>
+
                                 <th class="px-2 py-2">Dni</th>
                                 <th class="px-2 py-2">Nombre</th>
                                 <th class="px-2 py-2">Apellido</th>
+
+                                <th class="px-2 py-2">Nombre</th>
+                                <th class="px-2 py-2">Dni</th>
+
                                 <th class="px-2 py-2">Whatsapp</th>
                                 <th class="px-2 py-2">Correo</th>
                                 <th class="px-2 py-2">Direccion</th>
                                 <th class="px-2 py-2">Cumpleaños</th>
                                 <th class="px-2 py-2">Puntos</th>
+
+
+                                <th class="px-2 py-2">Preferencia</th>
+
                                 <th class="px-2 py-2">Estado</th>
                                 <th class="px-2 py-2">Acciones</th>
                             </tr>
@@ -344,14 +398,22 @@ const remove = (customer: Customer): void => {
                                 <td class="px-2 py-2">{{ customers.dni }}</td>
                                 <td class="px-2 py-2">{{ customers.name }}</td>
                                 <td class="px-2 py-2">{{ customers.last_name }}</td>
+
                                 <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
                                 <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
                                 <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
                                 <td class="px-2 py-2">{{ customers.birthday }}</td>
+
+                                <td class="px-2 py-2">{{ customers.birthday }}</td>
+                                <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
+                                <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
+                                <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
+
                                 <td class="px-2 py-2">{{ customers.score ?? '-' }}</td>
                                 <td class="px-2 py-2">{{ customers.state ?? '-' }}</td>
                                 <td class="px-2 py-2">
                                     <div class="flex gap-2">
+
                                         <Button type="button" variant="secondary" size="sm"
                                             :disabled="form.processing || deleteForm.processing"
                                             @click="startEdit(customers)">
@@ -362,6 +424,18 @@ const remove = (customer: Customer): void => {
                                             @click="remove(customers)">
                                             Eliminar
                                         </Button>
+
+                                        <!-- <Button type="button" variant="secondary" size="sm"
+                                                :disabled="form.processing || deleteForm.processing"
+                                                @click="startEdit(customers)">
+                                                Editar
+                                            </Button>
+                                            <Button type="button" variant="destructive" size="sm"
+                                                :disabled="form.processing || deleteForm.processing"
+                                                @click="remove(customers)">
+                                                Eliminar
+                                            </Button> -->
+
                                     </div>
                                 </td>
                             </tr>

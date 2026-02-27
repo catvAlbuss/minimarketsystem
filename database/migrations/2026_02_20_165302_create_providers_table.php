@@ -14,15 +14,19 @@ return new class extends Migration
         Schema::create('providers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_products')->references('id')->on('products')->onDelete('cascade');
+
             $table->integer('ruc');
+
+            $table->string('ruc');
+
             $table->string('company_name');
             $table->string('contact_person');
             $table->integer('phone');
             $table->string('email');
             $table->string('address');
-            $table->enum('category',['wholesaler', 'retailer','distributor','manufacturer']);
+            $table->enum('category', ['wholesaler', 'retailer', 'distributor', 'manufacturer']);
             $table->string('description_products');
-            $table->enum('status',['active', 'inactive']);
+            $table->enum('status', ['active', 'inactive']);
             $table->timestamps();
         });
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
+
     protected $fillable = [
         'id_customers',
         'id_users',
@@ -26,4 +27,7 @@ class Sale extends Model
     {
         return $this->belongsTo(User::class, 'id_users');
     }
+
+    //
+
 }

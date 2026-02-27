@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
 class CategoryController extends Controller
 {
     /**
@@ -18,6 +17,7 @@ class CategoryController extends Controller
         return Inertia::render('categories/index', [
             'categories' => $category,
         ]);
+        //
     }
 
     /**
@@ -44,6 +44,7 @@ class CategoryController extends Controller
         ]);
 
         return to_route('categories.index');
+        //
     }
 
     /**
@@ -81,11 +82,13 @@ class CategoryController extends Controller
 
         $category->update($payload);
         return to_route('categories.index');
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(Category $category, String $categoryid)
     {
         $categories = Category::query()->findOrFail($categoryid);

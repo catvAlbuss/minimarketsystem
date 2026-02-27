@@ -1,4 +1,5 @@
 <script setup lang="ts">
+ 
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -304,3 +305,29 @@ const remove = (products: Products): void => {
     </AppLayout>
 
 </template>
+
+    <!-- import { type BreadcrumbItem } from '@/types';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'products',
+        href: './products',
+    },
+];
+</script>
+
+<template>
+
+    <Head title="products" />
+
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <div class="space-y-6 p-4">
+            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
+            </section>
+                hola
+            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
+            </section>
+        </div>
+    </AppLayout>
+</template>
+>>>>>>> ca91998998c9ef5e8dea0e0e1d114c3b708910ba -->

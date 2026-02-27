@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Promise\Create;
 use Illuminate\Container\Attributes\Log;
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,10 +17,18 @@ class CustomerController extends Controller
      */
     public function index()
     {
-            $customer = Customer::all();
-            return Inertia::render('customers/index', [
-                'customers' => $customer,
-            ]);
+
+        $customer = Customer::all();
+        return Inertia::render('customers/index', [
+            'customers' => $customer,
+        ]);
+        $customer = Customer::all();
+        //inertia
+        //json
+        // return response()->json($categories);
+        return Inertia::render('customers/index', [
+            'customers' => $customer,
+        ]);
     }
 
     /**
@@ -68,6 +77,7 @@ class CustomerController extends Controller
         // ], 201);
 
         return to_route('customers.index');
+        // 
     }
 
     /**
@@ -91,7 +101,7 @@ class CustomerController extends Controller
      */
     public function update(Request $request, String $customerid)
     {
-        
+
         $customer = Customer::query()->findOrFail($customerid);
 
         $validatedData = $request->validate([
@@ -120,16 +130,26 @@ class CustomerController extends Controller
 
         $customer->update($payload);
         return to_route('customers.index');
+
+        // public function update(Request $request, Customer $customer)
+        // {
+        // 
     }
 
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(Request $request, String $customerid)
     {
         $customer = Customer::query()->findOrFail($customerid);
-            
+
         $customer->delete();
         return to_route('customers.index');
+
+        // public function destroy(Customer $customer)
+        // {
+        //     //
+
     }
 }

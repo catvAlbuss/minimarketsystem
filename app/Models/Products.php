@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Products extends Model
 {
+
     protected $fillable = [
         'id_categories',
         'code',
@@ -23,4 +24,7 @@ class Products extends Model
     {
         return $this->belongsTo(Category::class, 'id_categories');
     }
+
+    //
+
 }

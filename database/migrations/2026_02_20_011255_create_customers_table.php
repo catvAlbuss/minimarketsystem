@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+
             $table->string('dni', 8)->unique();
             $table->string('name');
             $table->string('last_name');
@@ -22,6 +23,17 @@ return new class extends Migration
             $table->string('address');
             $table->integer('score')->default(0);
             $table->enum('state', ['active', 'inactive'])->default('active');
+
+            $table->string('dni');
+            $table->string('name');
+            $table->string('last_name');
+            $table->string('birthday');
+            $table->string('email');
+            $table->string('phone');
+            $table->string('addres');
+            $table->string('score');
+            $table->string('state');
+
             $table->timestamps();
         });
     }

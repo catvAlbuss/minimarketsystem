@@ -25,22 +25,27 @@ class UserController extends Controller
     {
         // Log:info($request);
         $validate = $request->validate([
-            'name'=>['required','string','max:250'],
-            'lastname'=>['required','string','max:250'],
-            'dni'=>['required', 'integer'],
-            'phone'=>['required', 'integer'],
-            'address'=>['required', 'string'],
-            'email'=>['required', 'string', 'email', 'unique:users,email'],
-            'password'=>['required', 'string', 'min: 8','confirmed'],
-            'children'=>['required', 'integer'],
-            'affiliate'=>['required', 'in:ONP,AFP'],
-            'insured'=>['required', 'in:EsSalud,SIS'],
-            'work_modality'=>['required', 'in:fullTime,partTime'],
-            'entry_date'=>['required'],
-            'retention'=>['required', 'in:yes,no'],
-            'entry_to_payroll'=>['required', 'in:yes,no'],
-            'role'=>['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente'],
-            'state'=>['required', 'in:active,inactive']
+            'name' => ['required', 'string', 'max:250'],
+            'lastname' => ['required', 'string', 'max:250'],
+
+            'dni' => ['required', 'integer'],
+            'phone' => ['required', 'integer'],
+
+            'dni' => ['required', 'integer', 'digits:8'],
+            'phone' => ['required', 'integer', 'digits:9'],
+
+            'address' => ['required', 'string'],
+            'email' => ['required', 'string', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min: 8', 'confirmed'],
+            'children' => ['required', 'integer'],
+            'affiliate' => ['required', 'in:ONP,AFP'],
+            'insured' => ['required', 'in:EsSalud,SIS'],
+            'work_modality' => ['required', 'in:fullTime,partTime'],
+            'entry_date' => ['required'],
+            'retention' => ['required', 'in:yes,no'],
+            'entry_to_payroll' => ['required', 'in:yes,no'],
+            'role' => ['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente'],
+            'state' => ['required', 'in:active,inactive']
         ]);
 
         // Log:info($validate);
@@ -67,30 +72,32 @@ class UserController extends Controller
         return to_route('users.index');
     }
 
-    public function update(Request $request, string $userId){
+    public function update(Request $request, string $userId)
+    {
 
-        Log:info($request);
+        Log:
+        info($request);
         $user = User::query()->findOrFail($userId);
 
         $validate = $request->validate([
-            'name'=>['required','string','max:250'],
-            'lastname'=>['required','string','max:250'],
-            'dni'=>['required', 'integer'],
-            'phone'=>['required', 'integer'],
-            'address'=>['required', 'string'],
-            'email'=>['required', 'string', 'email',  Rule::unique('users', 'email')->ignore($user->id)],
-            'password'=>['nullable', 'string', 'min: 8', 'confirmed'],
-            'children'=>['required', 'integer'],
-            'affiliate'=>['required', 'in:ONP,AFP'],
-            'insured'=>['required', 'in:EsSalud,SIS'],
-            'work_modality'=>['required', 'in:fullTime,partTime'],
-            'entry_date'=>['required'],
-            'retention'=>['required', 'in:yes,no'],
-            'entry_to_payroll'=>['required', 'in:yes,no'],
-            'role'=>['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente'],
-            'state'=>['required', 'in:active,inactive']
+            'name' => ['required', 'string', 'max:250'],
+            'lastname' => ['required', 'string', 'max:250'],
+            'dni' => ['required', 'integer'],
+            'phone' => ['required', 'integer'],
+            'address' => ['required', 'string'],
+            'email' => ['required', 'string', 'email',  Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min: 8', 'confirmed'],
+            'children' => ['required', 'integer'],
+            'affiliate' => ['required', 'in:ONP,AFP'],
+            'insured' => ['required', 'in:EsSalud,SIS'],
+            'work_modality' => ['required', 'in:fullTime,partTime'],
+            'entry_date' => ['required'],
+            'retention' => ['required', 'in:yes,no'],
+            'entry_to_payroll' => ['required', 'in:yes,no'],
+            'role' => ['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente'],
+            'state' => ['required', 'in:active,inactive']
         ]);
-        
+
         $payload = [
             'name' => $validate['name'],
             'lastname' => $validate['lastname'],
@@ -116,8 +123,8 @@ class UserController extends Controller
         }
 
         //Actualiza los nuevos datos de payload en la variable user
-        $user -> update($payload);
-        
+        $user->update($payload);
+
         return to_route('users.index');
     }
 
