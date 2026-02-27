@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-vue-next';
+
+import { BookOpen, Folder, LayoutGrid, User } from 'lucide-vue-next';
+
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import branches from '@/routes/branches';
 import {
     Sidebar,
     SidebarContent,
@@ -17,26 +20,65 @@ import { type NavItem } from '@/types';
 import AppLogo from './AppLogo.vue';
 import { dashboard } from '@/routes';
 
+// IMPORTAR RUTAS
+import products from '@/routes/products';
+
+import users from '@/routes/users';
+import customers from '@/routes/customers';
+import categories from '@/routes/categories';
+import sales from '@/routes/sales';
+import providers from '@/routes/providers';
+import promotions from '@/routes/promotions';
+
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Users',
+        href: users.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Productos',
+        href: products.index.url(),
+        icon: LayoutGrid,
+    },
+
+    {
+        title: 'Sucursales',
+        href: branches.index.url(),
+    },
+    {
+        title: 'Ventas',
+        href: sales.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Categorías',
+        href: categories.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Clientes',
+        href: customers.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Proveedores',
+        href: providers.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Promociones',
+        href: promotions.index.url(),
+        icon: LayoutGrid,
+
+    },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Github Repo',
-        href: 'https://github.com/laravel/vue-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#vue',
-        icon: BookOpen,
-    },
-];
 </script>
 
 <template>
@@ -58,7 +100,6 @@ const footerNavItems: NavItem[] = [
         </SidebarContent>
 
         <SidebarFooter>
-            <NavFooter :items="footerNavItems" />
             <NavUser />
         </SidebarFooter>
     </Sidebar>
