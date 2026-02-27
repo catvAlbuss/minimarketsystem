@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { provide, ref } from 'vue';
+import { ref } from 'vue';
 import { computed } from 'vue';
 import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
 import InputError from '@/components/InputError.vue';
@@ -41,8 +41,13 @@ type Props = {
 };
 
 const AddProduct = ref<AddProducts[]>([]);
-const promotionName = ref('');
-const state = ref('');
+// const promotionName = ref('');
+// const state = ref('');
+
+const form = useForm({
+    name_promotion: '',
+    state: ''
+});
 
 const props = defineProps<Props>();
 const promotion = computed(() => props.promotions);
@@ -58,58 +63,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 const editingId = ref<number | null>(null);
 const isEditing = computed(() => editingId.value !== null);
 
-// const form = useForm({
-//     id_products: 0,
-//     name_promotion: '',
-//     price: 0,
-//     state: '',
-// });
-
 const deleteForm = useForm({});
 const deleteError = computed(
     () => (deleteForm.errors as Record<string, string | undefined>).delete,
 );
-
-// const resetForm = (): void => {
-//     editingId.value = null;
-//     form.reset();
-// };
-
-// const submit = (): void => {
-//     const option = {
-//         preserveScroll: true,
-//         onSuccess: () => resetForm(),
-//     };
-//     const box = JSON.stringify(form);
-//     console.log('Desde la condicion: ', box);
-//     if (isEditing.value && editingId.value !== null) {
-//         // console.log(form)
-//         const box = JSON.stringify(form);
-//         console.log('Desde la condicion: ', box);
-//         form.put(ProviderController.update.url(editingId.value), option);
-//         return;
-//     }
-
-//     form.post(ProviderController.store.url(), option);
-// };
-
-// const startEdit = (provider: Promotion): void => {
-//     editingId.value = provider.id;
-//     form.clearErrors();
-//     form.name_promotion = provider.name_promotion;
-//     form.price = provider.price;
-//     form.state = provider.state;
-// };
-
-// const remove = (promotion: Promotion): void => {
-//     if (!confirm(`Eliminar usuario "${promotion.name_promotion}"?`)) {
-//         return;
-//     }
-
-//     deleteForm.delete(ProviderController.destroy.url(promotion.id), {
-//         preserveScroll: true,
-//     });
-// };
 
 const total = computed(() => {
     return AddProduct.value.reduce(
@@ -142,13 +99,24 @@ const selectedIds = computed(() => {
     return new Set(AddProduct.value.map((item) => item.id));
 });
 
+const resetData = () => {
+    editingId.value = null;
+    form.reset();
+    AddProduct.value = [];
+};
+
 const crearPromotion = async () => {
+    // const option = {
+    //     preserveScroll: true,
+    //     onSuccess: () => resetData(),
+    // };
+
     if (AddProduct.value.length === 0) {
         alert('Selecciona un producto');
         return;
     }
-
-    if (!confirm('¿Confirmar la venta?')) {
+    if (!form.name_promotion || !form.state) {
+        alert('Por favor complete el nombre y el estado');
         return;
     }
 
@@ -156,27 +124,68 @@ const crearPromotion = async () => {
         item: AddProduct.value.map((item) => ({
             id: item.id,
         })),
-        name_promotion: promotionName.value,
+        name_promotion: form.name_promotion,
         price: total.value,
-        state: state.value,
+        state: form.state,
     };
 
-    const box = JSON.stringify(data);
-    console.log(box);
+    if (isEditing.value && editingId.value !== null) {
+        // pasa los datos al controllador en el metodo update
+        router.put(`/promotions/${editingId.value}`, data, {
+            onSuccess: () => {
+                resetData();
+                alert('Promocion Actualizada');
+            },onError: (errors) => form.setError(errors),
+        });
+    } else {
+        const box = JSON.stringify(data);
+        console.log(box);
 
-    router.post('/promotions', data);
+        router.post('/promotions', data, {
+            preserveScroll: true,
+            onSuccess: ()=>{
+                resetData();
+                alert('Promocion creada.')
+            },
+            onError: (errors) => form.setError(errors),
+        });
+    }
 
-    //  AddProduct.value = [];
 };
 
-// const autocompletDescription=()=> {
-//     const selectProd =  product.value.find(p =>p.id === form.id_products);
-//     if (selectProd) {
-//         form.description_products = selectProd.code;
-//     }else{
-//         form.description_products = '';
-//     }
-// };
+const startEdit = (prom: Promotion): void => {
+    editingId.value = prom.id;
+    form.name_promotion = prom.name_promotion;
+    form.state = prom.state;
+
+    AddProduct.value = []; //limpia el arreglo de AddProduct
+
+    const productInCombo = props.promotions.filter(
+        (p) => p.name_promotion === prom.name_promotion,
+    );
+
+    productInCombo.forEach((item) => {
+        const prodData = props.products.find((p) => p.id === item.id_products);
+        if (prodData) {
+            addProduct(prodData);
+        }
+    });
+};
+
+const remove = (prom: Promotion): void =>{
+    if(!confirm(`Eliminar usuario "${prom.name_promotion}"?`)){
+        return;
+    }
+
+    router.delete(`/promotions/${prom.id}`,{
+        preserveScroll: true,
+        onSuccess: ()=>{
+            if (editingId.value === prom.id) {
+                resetData();
+            }
+        }
+    });
+}
 </script>
 
 <template>
@@ -227,7 +236,7 @@ const crearPromotion = async () => {
                                         type="button"
                                         variant="secondary"
                                         size="sm"
-                                        @click=""
+                                        @click="startEdit(prom)"
                                     >
                                         Editar
                                     </Button>
@@ -238,7 +247,7 @@ const crearPromotion = async () => {
                                         type="button"
                                         variant="destructive"
                                         size="sm"
-                                        @click=""
+                                        @click="remove(prom)"
                                     >
                                         Eliminar
                                     </Button>
@@ -371,26 +380,16 @@ const crearPromotion = async () => {
                                             >
                                                 Agregar
                                             </Button>
-                                            <!-- <Button type="button" variant="secondary" size="sm" :disabled="form.processing ||
-                                            deleteForm.processing
-                                            " @click="startEdit(prov)">
-                                            Editar
-                                        </Button> -->
-                                            <!-- <Button type="button" variant="destructive" size="sm" :disabled="form.processing ||
-                                            deleteForm.processing
-                                            " @click="remove(prov)">
-                                            Eliminar
-                                        </Button> -->
                                         </div>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <!-- <InputError :message="deleteError" class="mt-3" /> -->
+                    <InputError :message="deleteError" class="mt-3" />
                 </section>
 
-                <!-- Apartado de  -->
+                <!-- Apartado de creacion de Combos -->
                 <section
                     class="rounded-xl border border-sidebar-border/70 bg-background p-4"
                 >
@@ -453,12 +452,14 @@ const crearPromotion = async () => {
                             <label class="text-sm font-bold text-white"
                                 >Nombre de la Promoción:</label
                             >
-                            <input
-                                v-model="promotionName"
+                            <Input
+                                v-model="form.name_promotion"
                                 type="text"
                                 placeholder="Ej: Promo Verano, 2x1..."
                                 class="rounded-lg border border-gray-300 p-2 outline-none focus:ring-2 focus:ring-blue-500"
+                                required
                             />
+                            <InputError :message="form.errors.name_promotion" />
                         </div>
                     </div>
                     <div class="mb-4 flex gap-4 overflow-y-auto">
@@ -479,7 +480,7 @@ const crearPromotion = async () => {
                             <Label for="id_products">Estado</Label>
                             <select
                                 id="id_products"
-                                v-model="state"
+                                v-model="form.state"
                                 required
                                 class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
                             >
@@ -489,13 +490,17 @@ const crearPromotion = async () => {
                                 <option :value="'active'">Activo</option>
                                 <option :value="'inactive'">Inactivo</option>
                             </select>
-                            <!-- <InputError :message="form.errors.id_products" /> -->
+                            <InputError :message="form.errors.state" />
                         </div>
                         <div class="item-center">
-                            <Button @click="crearPromotion" type="submit"
-                                >Agregar Promocion
+                            <Button @click="crearPromotion" :disabled="form.processing" type="submit"
+                                >{{ isEditing ? 'Actualizar' : 'Crear' }}
                                 <i class="fas fa-plus"></i>
                             </Button>
+                            <Button v-if="isEditing" type="button" variant="secondary"
+                            @click="resetData">
+                            Cancelar
+                        </Button>
                         </div>
                     </div>
                 </section>
@@ -503,5 +508,3 @@ const crearPromotion = async () => {
         </div>
     </AppLayout>
 </template>
-
-<style></style>

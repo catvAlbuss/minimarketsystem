@@ -294,7 +294,7 @@ const autocompletDescription=()=> {
                         </tbody>
                     </table>
                 </div>
-                <!-- <InputError :message="deleteError" class="mt-3" /> -->
+                <InputError :message="deleteError" class="mt-3" />
             </section>
         </div>
     </AppLayout>
