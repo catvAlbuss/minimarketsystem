@@ -22,7 +22,7 @@ class BuyController extends Controller
         $users = User::all();
         return Inertia::render('buys/index', [
             'buys' => $buys,
-            'provider' => $providers,
+            'providers' => $providers,
             'users' => $users,
         ]);
     }
@@ -41,7 +41,7 @@ class BuyController extends Controller
     public function store(Request $request)
     {
         $validateData = $request->validate([
-            'id_provider' => 'required|exists:provider,id',
+            'id_provider' => 'required|exists:providers,id',
             'id_users' => 'required|exists:users,id',
             'voucher_number' => 'required|string|max:255|unique:buys,voucher_number',
             'total' => 'required|numeric|min:0',

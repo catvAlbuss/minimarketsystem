@@ -114,9 +114,8 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
-    // isEditing.value = null;
+    editingId.value=null;
     form.reset();
-    // deleteForm.reset();
     form.clearErrors();
     form.id_provider = props.providers?.[0]?.id ?? '';
     form.id_users = props.users?.[0]?.id ?? '';
@@ -304,12 +303,12 @@ const remove = (buys: Buy): void => {
                 <div class="flex items-center gap-5">
                     <button class="btn-menu-tw bg-transparent border-none cursor-pointer text-gray-700" id="menuToggle"
                         style="font-size:1.5em;padding:8px;display:none;"><i class="bi bi-list"></i></button>
-                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Productos</h1>
+                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Compras</h1>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2.5 bg-gray-100 rounded-full" style="padding:8px 15px;">
                         <i class="bi bi-person-circle text-2xl" style="color:#2b4485;"></i>
-                        <span class="font-medium text-gray-800" id="userName">Productos</span>
+                        <span class="font-medium text-gray-800" id="userName">Compras</span>
                     </div>
                 </div>
             </header>
@@ -327,7 +326,7 @@ const remove = (buys: Buy): void => {
 
                     <!-- CAMPO ID_PROVEEDOR -->
                     <div class="grid gap-2">
-                        <Label for="id_provider">Cliente</Label>
+                        <Label for="id_provider">Proveedor</Label>
                         <select id="id_provider" v-model="form.id_provider" required
                             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
                             <option value="" class="text-sm">Seleccione</option>

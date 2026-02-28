@@ -66,6 +66,7 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
+    editingId.value=null;
     form.reset();
     form.clearErrors();
     form.id_categories = props.categories?.[0]?.id ?? '';
