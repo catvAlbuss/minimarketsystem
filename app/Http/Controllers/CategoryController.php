@@ -18,10 +18,7 @@ class CategoryController extends Controller
         //
     }
 
-        return Inertia::render('categories/index', [
-            'categories' => $categories,
-        ]);
-    }
+       
 
     public function store(Request $request)
     {

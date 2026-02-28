@@ -24,15 +24,7 @@ return new class extends Migration
             $table->integer('score')->default(0);
             $table->enum('state', ['active', 'inactive'])->default('active');
 
-            $table->string('dni');
-            $table->string('name');
-            $table->string('last_name');
-            $table->string('birthday');
-            $table->string('email');
-            $table->string('phone');
-            $table->string('addres');
-            $table->string('score');
-            $table->string('state');
+           
 
             $table->timestamps();
         });

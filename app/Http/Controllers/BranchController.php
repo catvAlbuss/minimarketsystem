@@ -30,18 +30,26 @@ class BranchController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'id_users'     => 'required|exists:users,id',
-            'name'         => 'required|string|max:255',
-            'address'      => 'required|string',
-            'opening_time' => 'required',
-            'closing_time' => 'required',
-            'state'        => 'required|in:active,inactive',
+       $validated = $request->validate([
+            'id_users'     => ['required','exists:users,id'],
+            'name'         => ['required','string','max:255'],
+            'address'      => ['required','string'],
+            'opening_time' => ['required'],
+            'closing_time' => ['required'],
+            'state'        => ['required','in:active,inactive'],
         ]);
 
-        Branch::create($validated);
 
-        return redirect()->back()->with('message', 'Sucursal creada con éxito');
+        Branch::create([
+            'id_users'     => $validated['id_users'],
+            'name'         => $validated['name'],
+            'address'      => $validated['address'],
+            'opening_time' => $validated['opening_time'],
+            'closing_time' => $validated['closing_time'],
+            'state'        => $validated['state'],
+        ]);
+
+        return to_route('branches.index');
     }
 
     /**
