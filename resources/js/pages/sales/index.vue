@@ -484,3 +484,4 @@ const remove = (sales: Sale): void => {
     </AppLayout>
 
 </template>
+

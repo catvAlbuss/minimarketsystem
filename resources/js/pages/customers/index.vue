@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +8,6 @@ import { type BreadcrumbItem } from '@/types';
 import { computed, ref } from 'vue';
 import CustomerController from '@/actions/App/Http/Controllers/CustomerController';
 import InputError from '@/components/InputError.vue';
-
-
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,13 +20,11 @@ type Customer = {
     id: number;
     dni: string;
     name: string;
-
     last_name: string;
     birthday: string;
     email: string;
     phone: string;
     address: string;
-
     score: number;
     state: string;
 };
@@ -41,7 +35,6 @@ type props = {
 
 const props = defineProps<props>();
 const customer = computed(() => props.customers);
-
 
 const editingId = ref<number | null>(null);
 
@@ -57,14 +50,12 @@ const form = useForm({
     state: 'active',
 });
 
-
 const deleteForm = useForm({});
 const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
 
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
-    // isEditing.value = null;
     form.reset();
     deleteForm.reset();
 };
@@ -106,1026 +97,371 @@ const remove = (customer: Customer): void => {
         preserveScroll: true,
     });
 };
-
-
-// const form = useForm({
-//     id: null,
-//     nombre: '',
-//     dni: '',
-//     whatsapp: '',
-//     email: '',
-//     direccion: '',
-//     cumpleanos: '',
-//     puntos: 0,
-//     preferencia: 'Sin preferencia',
-//     estado: 'Normal',
-// });
-
-// const deleteForm = useForm({});
-// const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
-
-
 </script>
 
-<template class="bg-gray-100" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#1f2937;">
-
-    <Head title="Customers" />
+<template>
+    <Head title="Clientes" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-
-        <!-- <div class="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-            <div class="grid auto-rows-min gap-4 md:grid-cols-3">
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-                <div
-                    class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern />
-                </div>
-            </div>
-            <div
-                class="relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                <PlaceholderPattern />
-            </div>
-        </div> -->
-
+        
         <!-- Main Content -->
-        <main class="main-tw min-h-screen bg-gray-100 transition-all duration-300">
-            <!-- Top Bar -->
-            <header class="bg-white flex justify-between items-center sticky top-0 z-40"
-                style="padding:15px 30px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                <div class="flex items-center gap-5">
-                    <button class="btn-menu-tw bg-transparent border-none cursor-pointer text-gray-700" id="menuToggle"
-                        style="font-size:1.5em;padding:8px;display:none;"><i class="bi bi-list"></i></button>
-                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Clientes</h1>
+        <main class="min-h-screen bg-gray-50 p-6">
+            
+            <!-- Header -->
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Gestión de Clientes</h1>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2.5 bg-gray-100 rounded-full" style="padding:8px 15px;">
-                        <i class="bi bi-person-circle text-2xl" style="color:#2b4485;"></i>
-                        <span class="font-medium text-gray-800" id="userName">Clientes</span>
-                    </div>
-                </div>
-            </header>
+            </div>
 
-            <!-- Clientes Section -->
-            <section style="padding:30px;">
-
-                <!-- KPIs Clientes -->
-                <div class="kpi-grid mb-4">
-                    <div class="kpi-card">
-                        <p class="kpi-label">Total Clientes</p>
-                        <h3 class="kpi-value" id="kpiTotalClientes">0</h3>
-                    </div>
-                    <div class="kpi-card">
-                        <p class="kpi-label">Clientes Activos</p>
-                        <h3 class="kpi-value" id="kpiClientesActivos">0</h3>
-                    </div>
-                    <div class="kpi-card">
-                        <p class="kpi-label">Nuevos este Mes</p>
-                        <h3 class="kpi-value" id="kpiNuevosMes">0</h3>
-                    </div>
-                    <div class="kpi-card">
-                        <p class="kpi-label">Puntos por Canjear</p>
-                        <h3 class="kpi-value" id="kpiPuntosCanjear">0</h3>
-                    </div>
-                </div>
-
-                <!-- Barra de Búsqueda y Filtros -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <!-- FILTRAR CLIENTES -->
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
-                                    <input type="text" class="w-full max-w-md px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"" id="buscarCliente"
-                                        placeholder="Buscar por nombre, DNI o WhatsApp..." onkeyup="filtrarClientes()">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select text-black" id="filtroPreferencia"
-                                    onchange="filtrarClientes()">
-                                    <option value="">Todas las Preferencias</option>
-                                    <option value="Bebidas / Licores">Bebidas / Licores</option>
-                                    <option value="Limpieza / Hogar">Limpieza / Hogar</option>
-                                    <option value="Abarrotes">Abarrotes</option>
-                                    <option value="Mascotas">Mascotas</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <select class="form-select text-black" id="filtroEstado" onchange="filtrarClientes()">
-                                    <option value="">Todos los Estados</option>
-                                    <option value="Frecuente">Frecuente</option>
-                                    <option value="Normal">Normal</option>
-                                    <option value="VIP">VIP</option>
-                                    <option value="Inactivo">Inactivo</option>
-                                </select>
-                            </div>
+            <!-- KPIs Cards -->
+            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Clientes</p>
+                            <h3 class="mt-1 text-3xl font-bold text-gray-900">{{ customer.length }}</h3>
                         </div>
-                        <div class="mt-2">
-                            <small class="text-muted" id="resultadoBusqueda">Mostrando todos los clientes</small>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
 
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Clientes Activos</p>
+                            <h3 class="mt-1 text-3xl font-bold text-green-600">{{ customer.filter(c => c.state === 'active').length }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-50">
+                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-            </section>
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Puntos Totales</p>
+                            <h3 class="mt-1 text-3xl font-bold text-amber-600">{{ customer.reduce((sum, c) => sum + (c.score || 0), 0) }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-50">
+                            <svg class="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- CREAR CLIENTES -->
-            <section class="border border-sidebar-border/70 bg-background p-4">
-                <h1 class="text-xl font-semibold">
-                    {{ isEditing ? 'Editar cliente' : 'Nuevo cliente' }}
-                </h1>
-                <p class="mt-1 text-sm text-muted-foreground">
-                    Gestiona clientes desde esta misma vista.
-                </p>
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Cumpleaños este Mes</p>
+                            <h3 class="mt-1 text-3xl font-bold text-pink-600">{{ customer.filter(c => new Date(c.birthday).getMonth() === new Date().getMonth()).length }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-pink-50">
+                            <svg class="h-6 w-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
-                    <!-- CAMPO NOMBRE -->
-                    <div class="grid gap-2">
-                        <Label for="nombre">Nombre</Label>
-                        <Input id="nombre" v-model="form.name" type="text" placeholder="Ej: Juan Pérez" required />
+            <!-- Formulario de Cliente -->
+            <section class="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="mb-5 flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">
+                            {{ isEditing ? ' Editar cliente' : ' Nuevo cliente' }}
+                        </h2>
+                        <p class="text-sm text-gray-500">
+                            {{ isEditing ? 'Modificar datos del cliente' : 'Registra un nuevo cliente' }}
+                        </p>
+                    </div>
+                </div>
+
+                <form class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" @submit.prevent="submit">
+                    
+                    <!-- Nombre -->
+                    <div class="space-y-2">
+                        <Label for="name" class="text-sm font-medium text-gray-700">Nombre </Label>
+                        <Input 
+                            id="name" 
+                            v-model="form.name" 
+                            type="text" 
+                            placeholder="Ej: Juan"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.name" />
                     </div>
-                    <!-- CAMPO APELLIDO -->
-                    <div class="grid gap-2">
-                        <Label for="apellido">Apellido</Label>
-                        <Input id="apellido" v-model="form.last_name" type="text" placeholder="Ej: Pérez" required />
+
+                    <!-- Apellido -->
+                    <div class="space-y-2">
+                        <Label for="last_name" class="text-sm font-medium text-gray-700">Apellido </Label>
+                        <Input 
+                            id="last_name" 
+                            v-model="form.last_name" 
+                            type="text" 
+                            placeholder="Ej: Pérez"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.last_name" />
                     </div>
-                    <!-- CAMPO DNI -->
-                    <div class="grid gap-2">
-                        <Label for="dni">DNI</Label>
-                        <Input id="dni" v-model="form.dni" type="text" placeholder="Ej: 12345678" required
-                            :readonly="isEditing" />
+
+                    <!-- DNI -->
+                    <div class="space-y-2">
+                        <Label for="dni" class="text-sm font-medium text-gray-700">DNI </Label>
+                        <Input 
+                            id="dni" 
+                            v-model="form.dni" 
+                            type="text" 
+                            placeholder="Ej: 12345678"
+                            required
+                            :readonly="isEditing"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60']"
+                        />
                         <InputError :message="form.errors.dni" />
                     </div>
-                    <!-- CAMPO CELULAR -->
-                    <div class="grid gap-2">
-                        <Label for="celular">Celular</Label>
-                        <Input id="celular" v-model="form.phone" type="text" placeholder="Ej: 987654321" required />
+
+                    <!-- Celular -->
+                    <div class="space-y-2">
+                        <Label for="phone" class="text-sm font-medium text-gray-700">Celular </Label>
+                        <Input 
+                            id="phone" 
+                            v-model="form.phone" 
+                            type="tel" 
+                            placeholder="Ej: 987654321"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.phone" />
                     </div>
-                    <!-- CAMPO EMAIL -->
-                    <div class="grid gap-2">
-                        <Label for="email">Email</Label>
-                        <Input id="email" v-model="form.email" type="email" placeholder="Ej: juan@ejemplo.com" required
-                            :readonly="isEditing" />
+
+                    <!-- Email -->
+                    <div class="space-y-2">
+                        <Label for="email" class="text-sm font-medium text-gray-700">Email </Label>
+                        <Input 
+                            id="email" 
+                            v-model="form.email" 
+                            type="email" 
+                            placeholder="Ej: juan@email.com"
+                            required
+                            :readonly="isEditing"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-60']"
+                        />
                         <InputError :message="form.errors.email" />
                     </div>
-                    <!-- CAMPO DIRECCION -->
-                    <div class="grid gap-2">
-                        <Label for="direccion">Dirección</Label>
-                        <Input id="direccion" v-model="form.address" type="text" placeholder="Ej: Av. Principal 123" />
+
+                    <!-- Dirección -->
+                    <div class="space-y-2 md:col-span-2">
+                        <Label for="address" class="text-sm font-medium text-gray-700">Dirección </Label>
+                        <Input 
+                            id="address" 
+                            v-model="form.address" 
+                            type="text" 
+                            placeholder="Ej: Av. Principal 123, Distrito"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.address" />
                     </div>
-                    <!-- CAMPO CUMPLEAÑOS -->
-                    <div class="grid gap-2">
-                        <Label for="cumpleanos">Cumpleaños</Label>
-                        <Input class="[color-scheme:dark]" id="cumpleanos" v-model="form.birthday" type="date"
-                            placeholder="Ej: 1990-01-01" />
+
+                    <!-- Cumpleaños -->
+                    <div class="space-y-2">
+                        <Label for="birthday" class="text-sm font-medium text-gray-700">Cumpleaños </Label>
+                        <Input 
+                            id="birthday" 
+                            v-model="form.birthday" 
+                            type="date"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.birthday" />
                     </div>
-                    <!-- CAMPO SCORE -->
-                    <div class="grid gap-2">
-                        <Label for="puntos">Puntos</Label>
-                        <Input class="[color-scheme:dark]" id="puntos" v-model="form.score" type="number"
-                            placeholder="Ej: 100" />
+
+                    <!-- Puntos/Score -->
+                    <div class="space-y-2">
+                        <Label for="score" class="text-sm font-medium text-gray-700">Puntos </Label>
+                        <Input 
+                            id="score" 
+                            v-model="form.score" 
+                            type="number" 
+                            min="0"
+                            placeholder="0"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.score" />
                     </div>
-                    <!-- CAMPO DE ESTADO: ACTIVO O INACTIVO -->
-                    <div class="grid gap-2">
-                        <Label for="estado">Estado</Label>
-                        <select id="estado" v-model="form.state" required placeholder="Ej: Activo o Inactivo"
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <!-- <option v-for="estado in form.state" :key="estado" :value="estado">
-                                {{ estado }}
-                            </option> -->
-                            <option value="active">Activo</option>
-                            <option value="inactive">Inactivo</option>
+
+                    <!-- Estado -->
+                    <div class="space-y-2">
+                        <Label for="state" class="text-sm font-medium text-gray-700">Estado </Label>
+                        <select 
+                            id="state" 
+                            v-model="form.state" 
+                            required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        >
+                            <option value="active">🟢 Activo</option>
+                            <option value="inactive">🔴 Inactivo</option>
                         </select>
                         <InputError :message="form.errors.state" />
                     </div>
 
-                    <!-- <div class="grid gap-2">
-                        <Label for="password">
-                            Password
-                            <span v-if="isEditing" class="text-xs text-muted-foreground">(opcional en edicion)</span>
-                        </Label>
-                        <Input id="password" v-model="form.password" type="password" :required="!isEditing" />
-                        <InputError :message="form.errors.password" />
-                    </div> -->
-
-                    <!-- <div class="grid gap-2">
-                        <Label for="password_confirmation">Confirmar password</Label>
-                        <Input id="password_confirmation" v-model="form.password_confirmation" type="password"
-                            :required="!isEditing" />
-                    </div> -->
-
-                    <div class="col-span-full flex gap-2">
-                        <Button type="submit" :disabled="form.processing || deleteForm.processing">
-                            {{ isEditing ? 'Actualizar' : 'Crear' }}
+                    <!-- Botones -->
+                    <div class="col-span-full flex gap-3 pt-2">
+                        <Button 
+                            type="submit" 
+                            :disabled="form.processing || deleteForm.processing"
+                            :class="['inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:scale-105 hover:shadow-blue-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100']"
+                        >
+                            <span v-if="form.processing" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            {{ isEditing ? ' Actualizar' : ' Crear Cliente' }}
                         </Button>
-                        <Button v-if="isEditing" type="button" variant="secondary"
-                            :disabled="form.processing || deleteForm.processing" @click="resetForm">
+                        <Button 
+                            v-if="isEditing" 
+                            type="button" 
+                            variant="secondary"
+                            :disabled="form.processing || deleteForm.processing" 
+                            @click="resetForm"
+                            :class="['rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50']"
+                        >
                             Cancelar
                         </Button>
                     </div>
-
                 </form>
-
-                <!-- MOSTRANDO CLIENTES -->
-
-                <!-- Botón Nuevo Cliente -->
-                <!-- <div class="d-flex justify-content-end mb-3">
-                    <button class="btn btn-primary text-black bg-blue-500 rounded-lg p-2" data-bs-toggle="modal"
-                        data-bs-target="#modalCliente" onclick="prepararModalNuevoCliente()" >
-                        <i class="bi bi-person-plus"></i> Nuevo Cliente
-                    </button>
-                </div> -->
-
-                <!-- Tarjetas de Clientes -->
-                <!-- <div class="row g-4" id="contenedorTarjetasClientes"> -->
-                <!-- Se genera con JavaScript -->
-                <!-- </div> -->
-
-
             </section>
 
-            <!-- MOSTRAR CLIENTES -->
-            <section class="border border-sidebar-border/70 bg-background p-4">
-                <h2 class="text-lg font-semibold">Listado de clientes</h2>
+            <!-- Tabla de Clientes -->
+            <section class="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="border-b border-gray-200 p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-900">Listado de Clientes</h2>
+                                <p class="text-sm text-gray-500">{{ customer.length }} clientes registrados</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2">
+                            <span class="text-sm font-semibold text-blue-700">{{ customer.length }}</span>
+                            <span class="text-sm text-blue-600">clientes</span>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="mt-4 overflow-x-auto">
-                    <table class="w-full min-w-[720px] text-sm">
-                        <thead class="border-b text-left">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-2 py-2">ID</th>
-
-                                <th class="px-2 py-2">Dni</th>
-                                <th class="px-2 py-2">Nombre</th>
-                                <th class="px-2 py-2">Apellido</th>
-
-                                <th class="px-2 py-2">Nombre</th>
-                                <th class="px-2 py-2">Dni</th>
-
-                                <th class="px-2 py-2">Whatsapp</th>
-                                <th class="px-2 py-2">Correo</th>
-                                <th class="px-2 py-2">Direccion</th>
-                                <th class="px-2 py-2">Cumpleaños</th>
-                                <th class="px-2 py-2">Puntos</th>
-
-
-                                <th class="px-2 py-2">Preferencia</th>
-
-                                <th class="px-2 py-2">Estado</th>
-                                <th class="px-2 py-2">Acciones</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Cliente</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">DNI</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Contacto</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Cumpleaños</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Puntos</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Estado</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="customer.length === 0">
-                                <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
-                                    No hay usuarios registrados.
+                                <td colspan="7" class="px-4 py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <svg class="h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                        <p class="text-gray-500">No hay clientes registrados</p>
+                                    </div>
                                 </td>
                             </tr>
-                            <tr v-for="customers in customer" :key="customers.id" class="border-b">
-                                <td class="px-2 py-2">{{ customers.id }}</td>
-                                <td class="px-2 py-2">{{ customers.dni }}</td>
-                                <td class="px-2 py-2">{{ customers.name }}</td>
-                                <td class="px-2 py-2">{{ customers.last_name }}</td>
-
-                                <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.birthday }}</td>
-
-                                <td class="px-2 py-2">{{ customers.birthday }}</td>
-                                <td class="px-2 py-2">{{ customers.email ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.phone ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.address ?? '-' }}</td>
-
-                                <td class="px-2 py-2">{{ customers.score ?? '-' }}</td>
-                                <td class="px-2 py-2">{{ customers.state ?? '-' }}</td>
-                                <td class="px-2 py-2">
-                                    <div class="flex gap-2">
-
-                                        <Button type="button" variant="secondary" size="sm"
+                            <tr 
+                                v-for="c in customer" 
+                                :key="c.id" 
+                                class="border-t border-gray-100 transition-colors hover:bg-gray-50"
+                            >
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                                            <span class="text-sm font-bold text-blue-700">{{ c.name.charAt(0).toUpperCase() }}</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-900">{{ c.name }} {{ c.last_name }}</p>
+                                            <p class="text-xs text-gray-500">{{ c.address?.substring(0, 30) }}{{ c.address?.length > 30 ? '...' : '' }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">{{ c.dni }}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="space-y-1">
+                                        <p class="text-gray-600"> {{ c.phone || '-' }}</p>
+                                        <p class="text-gray-600"> {{ c.email || '-' }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">
+                                    {{ c.birthday ? new Date(c.birthday).toLocaleDateString('es-PE') : '-' }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
+                                        ⭐ {{ c.score || 0 }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span 
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="c.state === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+                                    >
+                                        <span :class="c.state === 'active' ? 'bg-green-600' : 'bg-red-600'" class="h-1.5 w-1.5 rounded-full"></span>
+                                        {{ c.state === 'active' ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <Button 
+                                            type="button" 
+                                            variant="secondary" 
+                                            size="sm"
                                             :disabled="form.processing || deleteForm.processing"
-                                            @click="startEdit(customers)">
+                                            @click="startEdit(c)"
+                                            :class="['rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50']"
+                                        >
                                             Editar
                                         </Button>
-                                        <Button type="button" variant="destructive" size="sm"
-                                            :disabled="form.processing || deleteForm.processing"
-                                            @click="remove(customers)">
+                                        <Button 
+                                            type="button" 
+                                            variant="destructive" 
+                                            size="sm"
+                                            :disabled="form.processing || deleteForm.processing" 
+                                            @click="remove(c)"
+                                            :class="['rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-100 disabled:opacity-50']"
+                                        >
                                             Eliminar
                                         </Button>
-
-                                        <!-- <Button type="button" variant="secondary" size="sm"
-                                                :disabled="form.processing || deleteForm.processing"
-                                                @click="startEdit(customers)">
-                                                Editar
-                                            </Button>
-                                            <Button type="button" variant="destructive" size="sm"
-                                                :disabled="form.processing || deleteForm.processing"
-                                                @click="remove(customers)">
-                                                Eliminar
-                                            </Button> -->
-
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <InputError :message="deleteError" class="mt-3" />
             </section>
 
         </main>
-
     </AppLayout>
-
 </template>
-
-<style>
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 14px 25px;
-    color: #374151;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    border-left: 4px solid transparent;
-}
-
-.nav-item i {
-    font-size: 1.2em;
-    width: 24px;
-    text-align: center;
-}
-
-.nav-item:hover {
-    background: #f9fafb;
-    color: #2b4485;
-    border-left-color: #2b4485;
-}
-
-.nav-item.active {
-    background: rgba(43, 68, 133, 0.1);
-    color: #2b4485;
-    border-left-color: #2b4485;
-}
-
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-@media(max-width:1200px) {
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media(max-width:768px) {
-    .kpi-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.kpi-card {
-    background: white;
-    padding: 24px 20px;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    min-height: 110px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
-
-.kpi-label {
-    font-size: 0.85em;
-    color: #6b7280;
-    margin-bottom: 8px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.kpi-value {
-    font-size: 1.75em;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-}
-
-.btn-logout:hover {
-    background: #ef4444 !important;
-    color: white !important;
-}
-
-.cliente-card {
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    border: 3px solid #2b4485;
-    height: 100%;
-}
-
-.cliente-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    border-color: #1a3366;
-}
-
-.cliente-card.inactivo {
-    opacity: 0.7;
-    background: #f8f9fa;
-    border-color: #9ca3af;
-}
-
-.cliente-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #e5e7eb;
-}
-
-.cliente-avatar {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-right: 12px;
-    flex-shrink: 0;
-}
-
-.cliente-info h5 {
-    font-size: 0.95em;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 2px;
-}
-
-.cliente-detalles {
-    margin: 10px 0;
-}
-
-.cliente-detalles p {
-    margin-bottom: 6px;
-    font-size: 0.8em;
-    color: #4b5563;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.cliente-detalles i {
-    width: 16px;
-    color: #2b4485;
-    margin-right: 6px;
-    font-size: 0.9em;
-}
-
-.cliente-preferencia {
-    display: inline-block;
-    padding: 3px 8px;
-    background: rgba(52, 152, 219, 0.1);
-    color: #3498db;
-    border-radius: 12px;
-    font-size: 0.7em;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.cliente-info-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 10px;
-    background: #f9fafb;
-    border-radius: 8px;
-    margin: 10px 0;
-    font-size: 0.8em;
-}
-
-.cliente-info-bar .info-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    white-space: nowrap;
-}
-
-.cliente-info-bar .cumpleanos {
-    color: #e74c3c;
-}
-
-.cliente-info-bar .puntos {
-    color: #f39c12;
-    font-weight: 600;
-}
-
-.cliente-info-bar .whatsapp {
-    color: #25D366;
-}
-
-.cliente-estado {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.7em;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.estado-frecuente {
-    background: rgba(46, 204, 113, 0.15);
-    color: #2ecc71;
-}
-
-.estado-normal {
-    background: rgba(52, 152, 219, 0.15);
-    color: #3498db;
-}
-
-.estado-vip {
-    background: rgba(155, 89, 182, 0.15);
-    color: #9b59b6;
-}
-
-.estado-inactivo {
-    background: rgba(107, 114, 128, 0.15);
-    color: #6b7280;
-}
-
-.btn-whatsapp-cliente {
-    width: 100%;
-    padding: 8px;
-    background: #25D366;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9em;
-}
-
-.btn-whatsapp-cliente:hover {
-    background: #128C7E;
-    transform: translateY(-2px);
-}
-
-.btn-acciones-cliente {
-    display: flex;
-    gap: 4px;
-    margin-top: 8px;
-}
-
-.btn-acciones-cliente .btn {
-    flex: 1;
-    padding: 6px;
-    font-size: 0.8em;
-}
-
-.proveedor-card {
-    background: white;
-    border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-    height: 100%;
-}
-
-.proveedor-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    border-color: #2b4485;
-}
-
-.proveedor-card.inactivo {
-    opacity: 0.7;
-    background: #f8f9fa;
-}
-
-.proveedor-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 15px;
-}
-
-.proveedor-icon {
-    width: 50px;
-    height: 50px;
-    background: #2b4485;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5em;
-    margin-right: 15px;
-}
-
-.proveedor-info h5 {
-    font-size: 1.1em;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 5px;
-}
-
-.proveedor-contacto {
-    margin: 15px 0;
-}
-
-.proveedor-contacto p {
-    margin-bottom: 8px;
-    font-size: 0.9em;
-    color: #4b5563;
-}
-
-.proveedor-contacto i {
-    width: 20px;
-    color: #2b4485;
-    margin-right: 8px;
-}
-
-.proveedor-categoria {
-    display: inline-block;
-    padding: 4px 12px;
-    background: #f9fafb;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 15px;
-}
-
-.btn-whatsapp {
-    width: 100%;
-    padding: 10px;
-    background: #25D366;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btn-whatsapp:hover {
-    background: #128C7E;
-    transform: translateY(-2px);
-}
-
-.btn-acciones-proveedor {
-    display: flex;
-    gap: 5px;
-    margin-top: 10px;
-}
-
-.btn-acciones-proveedor .btn {
-    flex: 1;
-    padding: 8px;
-    font-size: 0.85em;
-}
-
-.badge-activo {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
-}
-
-.badge-inactivo {
-    background: rgba(107, 114, 128, 0.15);
-    color: #6b7280;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
-}
-
-.card.sucursal-card {
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    border: 2px solid transparent !important;
-    background: white !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
-    position: relative !important;
-    z-index: 1 !important;
-}
-
-.card.sucursal-card:hover {
-    transform: translateY(-8px) !important;
-    border-color: #2b4485 !important;
-    box-shadow: 0 12px 35px rgba(43, 68, 133, 0.2) !important;
-    background-color: #f8fafc !important;
-    z-index: 10 !important;
-}
-
-.card.sucursal-card.active {
-    border-color: #2b4485 !important;
-    background-color: #f0f7ff !important;
-    box-shadow: 0 8px 25px rgba(43, 68, 133, 0.15) !important;
-}
-
-.card.sucursal-card:active {
-    transform: translateY(-4px) !important;
-}
-
-.kpi-mini {
-    background: #f8f9fa;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-}
-
-.card.sucursal-card:hover .kpi-mini {
-    background: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.kpi-mini-label {
-    font-size: 0.75rem;
-    color: #6b7280;
-    margin-bottom: 5px;
-    font-weight: 500;
-}
-
-.kpi-mini-value {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #111827;
-}
-
-.alerta-stock {
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.7;
-        transform: scale(1.05);
-    }
-}
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-    width: 100%;
-}
-
-.chart-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    height: 420px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chart-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
-
-.chart-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e5e7eb;
-    flex-shrink: 0;
-}
-
-.chart-header h4 {
-    font-size: 1em;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0;
-}
-
-.chart-container {
-    height: 320px;
-    position: relative;
-    flex: 1;
-}
-
-@media(max-width:992px) {
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.tabla-venta-item {
-    animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.btn-cantidad {
-    width: 30px;
-    height: 30px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.total-section {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-}
-
-.total-section .total-label {
-    font-size: 1.1em;
-    opacity: 0.9;
-}
-
-.total-section .total-amount {
-    font-size: 2em;
-    font-weight: bold;
-}
-
-.producto-row {
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.producto-row:hover {
-    background-color: #f8f9fa;
-}
-
-.promo-card {
-    border: 2px dashed #2b4485;
-    border-radius: 16px;
-    padding: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(43, 68, 133, 0.05) 0%, rgba(43, 68, 133, 0.02) 100%);
-}
-
-.promo-card:hover {
-    background: linear-gradient(135deg, rgba(43, 68, 133, 0.1) 0%, rgba(43, 68, 133, 0.05) 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-}
-
-.promo-card .promo-title {
-    font-weight: 700;
-    color: #2b4485;
-    margin-bottom: 12px;
-    font-size: 1.1em;
-}
-
-.promo-card .promo-products {
-    font-size: 0.9em;
-    color: #4b5563;
-    margin-bottom: 15px;
-}
-
-.promo-card .promo-products ul {
-    margin: 0;
-    padding-left: 20px;
-}
-
-.promo-card .promo-products li {
-    margin-bottom: 5px;
-}
-
-.promo-card .promo-price {
-    font-size: 1.4em;
-    font-weight: bold;
-    color: #10b981;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.promo-card .promo-price .precio-original {
-    font-size: 0.7em;
-    color: #6b7280;
-    text-decoration: line-through;
-}
-
-.promo-card .promo-price .badge {
-    font-size: 0.6em;
-    padding: 5px 10px;
-}
-
-#contenedorPromociones {
-    display: flex;
-    gap: 20px;
-    width: 100%;
-}
-
-#contenedorPromociones .col-md-6 {
-    flex: 1;
-    min-width: 0;
-}
-
-@media(max-width:768px) {
-    #contenedorPromociones {
-        flex-direction: column;
-    }
-}
-
-.btn-action {
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-    margin-right: 5px;
-}
-
-@media(max-width:992px) {
-    .sidebar-tw {
-        transform: translateX(-100%);
-    }
-
-    .sidebar-tw.show {
-        transform: translateX(0);
-    }
-
-    .main-tw {
-        margin-left: 0 !important;
-    }
-
-    .btn-menu-tw {
-        display: block !important;
-    }
-}
-
-@media(min-width:993px) {
-    .btn-menu-tw {
-        display: none !important;
-    }
-}
-</style>

@@ -69,9 +69,7 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
-    // isEditing.value = null;
     form.reset();
-    // deleteForm.reset();
     form.clearErrors();
     form.id_categories = props.categories?.[0]?.id ?? '';
 };
@@ -92,8 +90,6 @@ const startEdit = (products: Products): void => {
 };
 
 const submit = (): void => {
-    // const data = JSON.stringify(form);
-    // console.log('Submitting form with data:', data);
     const options = {
         preserveScroll: true,
         onSuccess: () => resetForm(),
@@ -116,179 +112,377 @@ const remove = (products: Products): void => {
 };
 </script>
 
-<template class="bg-gray-100" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#1f2937;">
-
-    <Head title="Products" />
+<template>
+    <Head title="Productos" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-
+        
         <!-- Main Content -->
-        <main class="main-tw min-h-screen bg-gray-100 transition-all duration-300">
-            <!-- Top Bar -->
-            <header class="bg-white flex justify-between items-center sticky top-0 z-40"
-                style="padding:15px 30px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
-                <div class="flex items-center gap-5">
-                    <button class="btn-menu-tw bg-transparent border-none cursor-pointer text-gray-700" id="menuToggle"
-                        style="font-size:1.5em;padding:8px;display:none;"><i class="bi bi-list"></i></button>
-                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Productos</h1>
+        <main class="min-h-screen bg-gray-50 p-6">
+            
+            <!-- Header -->
+            <div class="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Gestión de Productos</h1>
                 </div>
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2.5 bg-gray-100 rounded-full" style="padding:8px 15px;">
-                        <i class="bi bi-person-circle text-2xl" style="color:#2b4485;"></i>
-                        <span class="font-medium text-gray-800" id="userName">Productos</span>
+            </div>
+
+            <!-- KPIs Cards -->
+            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Productos</p>
+                            <h3 class="mt-1 text-3xl font-bold text-gray-900">{{ products.length }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </header>
 
-            <!-- CREAR CLIENTES -->
-            <section class="border border-sidebar-border/70 bg-background p-4">
-                <h1 class="text-xl font-semibold">
-                    {{ isEditing ? 'Editar producto' : 'Nuevo producto' }}
-                </h1>
-                <p class="mt-1 text-sm text-muted-foreground">
-                    Gestiona los productos desde esta misma vista.
-                </p>
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Stock Bajo</p>
+                            <h3 class="mt-1 text-3xl font-bold text-orange-600">{{ products.filter(p => p.stock < 10).length }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-50">
+                            <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-                <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Por Vencer</p>
+                            <h3 class="mt-1 text-3xl font-bold text-red-600">{{ products.filter(p => new Date(p.expiration_date) < new Date(Date.now() + 7*24*60*60*1000)).length }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-red-50">
+                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- CAMPO ID_CATEGORIA -->
-                    <div class="grid gap-2">
-                        <Label for="id_categories">Categoría</Label>
-                        <select id="id_categories" v-model="form.id_categories" required
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <option value="" class="text-sm">Seleccione</option>
-                            <option v-for="c in categories" :key="c.id" :value="c.id">
-                                {{ c.name }}
-                            </option>
+                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Valor Inventario</p>
+                            <h3 class="mt-1 text-3xl font-bold text-green-600">S/ {{ products.reduce((sum, p) => sum + (p.unit_price * p.stock), 0).toFixed(2) }}</h3>
+                        </div>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-50">
+                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de Producto -->
+            <section class="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="mb-5 flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-gray-900">
+                            {{ isEditing ? ' Editar producto' : ' Nuevo producto' }}
+                        </h2>
+                        <p class="text-sm text-gray-500">
+                            {{ isEditing ? 'Modifica los datos del producto' : 'Registra un nuevo producto al inventario' }}
+                        </p>
+                    </div>
+                </div>
+
+                <form class="grid gap-5 md:grid-cols-2 lg:grid-cols-3" @submit.prevent="submit">
+                    
+                    <!-- Categoría -->
+                    <div class="space-y-2">
+                        <Label for="id_categories" class="text-sm font-medium text-gray-700">Categoría </Label>
+                        <select 
+                            id="id_categories" 
+                            v-model="form.id_categories" 
+                            required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        >
+                            <option value="" disabled>Seleccione</option>
+                            <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
                         </select>
                         <InputError :message="form.errors.id_categories" />
                     </div>
-                    <!-- CAMPO CODIGO -->
-                    <div class="grid gap-2">
-                        <Label for="name">Código</Label>
-                        <Input id="name" v-model="form.code" type="text" placeholder="Ej: ajd12312asd" required />
+
+                    <!-- Código -->
+                    <div class="space-y-2">
+                        <Label for="code" class="text-sm font-medium text-gray-700">Código </Label>
+                        <Input 
+                            id="code" 
+                            v-model="form.code" 
+                            type="text" 
+                            placeholder="Ej: PROD-001"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.code" />
                     </div>
-                    <!-- CAMPO NOMBRE -->
-                    <div class="grid gap-2">
-                        <Label for="name">Nombre</Label>
-                        <Input id="name" v-model="form.name" type="text" placeholder="Ej: Yogurt" required />
+
+                    <!-- Nombre -->
+                    <div class="space-y-2">
+                        <Label for="name" class="text-sm font-medium text-gray-700">Nombre </Label>
+                        <Input 
+                            id="name" 
+                            v-model="form.name" 
+                            type="text" 
+                            placeholder="Ej: Yogurt Natural"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.name" />
                     </div>
-                    <!-- CAMPO DESCRIPCIÓN -->
-                    <div class="grid gap-2">
-                        <Label for="description">Descripción</Label>
-                        <Input id="description" v-model="form.description" type="text" placeholder="Ej: Descripción"
-                            required />
+
+                    <!-- Descripción -->
+                    <div class="space-y-2 md:col-span-2">
+                        <Label for="description" class="text-sm font-medium text-gray-700">Descripción </Label>
+                        <Input 
+                            id="description" 
+                            v-model="form.description" 
+                            type="text" 
+                            placeholder="Descripción del producto"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.description" />
                     </div>
-                    <!-- CAMPO PRECIO UNITARIO -->
-                    <div class="grid gap-2">
-                        <Label for="unit_price">Precio unitario</Label>
-                        <Input id="unit_price" v-model="form.unit_price" type="text" placeholder="Ej: 6.50"
-                            required />
+
+                    <!-- Precio Unitario -->
+                    <div class="space-y-2">
+                        <Label for="unit_price" class="text-sm font-medium text-gray-700">Precio Unitario </Label>
+                        <Input 
+                            id="unit_price" 
+                            v-model="form.unit_price" 
+                            type="number" 
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.unit_price" />
                     </div>
-                    <!-- CAMPO PRECIO AL MAYOR -->
-                    <div class="grid gap-2">
-                        <Label for="higher_price">Precio al mayor</Label>
-                        <Input id="higher_price" v-model="form.higher_price" type="text" placeholder="Ej: 5.50"
-                            required />
+
+                    <!-- Precio Mayor -->
+                    <div class="space-y-2">
+                        <Label for="higher_price" class="text-sm font-medium text-gray-700">Precio al Mayor </Label>
+                        <Input 
+                            id="higher_price" 
+                            v-model="form.higher_price" 
+                            type="number" 
+                            step="0.01"
+                            placeholder="0.00"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.higher_price" />
                     </div>
-                    <!-- CAMPO STOCK -->
-                    <div class="grid gap-2">
-                        <Label for="stock">Stock</Label>
-                        <Input id="stock" v-model="form.stock" type="text" placeholder="Ej: Descripción"
-                            required />
+
+                    <!-- Stock -->
+                    <div class="space-y-2">
+                        <Label for="stock" class="text-sm font-medium text-gray-700">Stock </Label>
+                        <Input 
+                            id="stock" 
+                            v-model="form.stock" 
+                            type="number" 
+                            placeholder="0"
+                            required
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.stock" />
                     </div>
-                    <!-- CAMPO FECHA DE VENCIMIENTO -->
-                    <div class="grid gap-2">
-                        <Label for="expiration_date">Fecha de vencimiento</Label>
-                        <Input class="[color-scheme:dark]" id="expiration_date" v-model="form.expiration_date" type="date"
-                            placeholder="Ej: 1990-01-01" />
+
+                    <!-- Fecha Vencimiento -->
+                    <div class="space-y-2">
+                        <Label for="expiration_date" class="text-sm font-medium text-gray-700">Fecha de Vencimiento </Label>
+                        <Input 
+                            id="expiration_date" 
+                            v-model="form.expiration_date" 
+                            type="date"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.expiration_date" />
                     </div>
-                    <!-- CAMPO DE DESCUENTO -->
-                    <div class="grid gap-2">
-                        <Label for="promotion_discount">Descuento %</Label>
-                        <Input id="promotion_discount" v-model="form.promotion_discount" type="text" placeholder="Ej: Descripción"
-                            required />
+
+                    <!-- Descuento -->
+                    <div class="space-y-2">
+                        <Label for="promotion_discount" class="text-sm font-medium text-gray-700">Descuento % </Label>
+                        <Input 
+                            id="promotion_discount" 
+                            v-model="form.promotion_discount" 
+                            type="number" 
+                            min="0"
+                            max="100"
+                            placeholder="0"
+                            :class="['w-full rounded-lg border border-gray-300 !bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20']"
+                        />
                         <InputError :message="form.errors.promotion_discount" />
                     </div>
-                    <!-- CAMPO DE ESTADO: ACTIVO O INACTIVO -->
-                    <div class="grid gap-2">
-                        <Label for="estado">Estado</Label>
-                        <select id="estado" v-model="form.state" required placeholder="Ej: Activo o Inactivo"
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <!-- <option v-for="estado in form.state" :key="estado" :value="estado">
-                                {{ estado }}
-                            </option> -->
-                            <option value="active">Activo</option>
-                            <option value="inactive">Inactivo</option>
+
+                    <!-- Estado -->
+                    <div class="space-y-2">
+                        <Label for="state" class="text-sm font-medium text-gray-700">Estado </Label>
+                        <select 
+                            id="state" 
+                            v-model="form.state" 
+                            required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-all focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        >
+                            <option value="active">🟢 Activo</option>
+                            <option value="inactive">🔴 Inactivo</option>
                         </select>
                         <InputError :message="form.errors.state" />
                     </div>
 
-                    <div class="col-span-full flex gap-2">
-                        <Button type="submit" :disabled="form.processing || deleteForm.processing">
-                            {{ isEditing ? 'Actualizar' : 'Crear' }}
+                    <!-- Botones -->
+                    <div class="col-span-full flex gap-3 pt-2">
+                        <Button 
+                            type="submit" 
+                            :disabled="form.processing || deleteForm.processing"
+                            :class="['inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:scale-105 hover:shadow-blue-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100']"
+                        >
+                            <span v-if="form.processing" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                            {{ isEditing ? ' Actualizar' : ' Crear Producto' }}
                         </Button>
-                        <Button v-if="isEditing" type="button" variant="secondary"
-                            :disabled="form.processing || deleteForm.processing" @click="resetForm">
+                        <Button 
+                            v-if="isEditing" 
+                            type="button" 
+                            variant="secondary"
+                            :disabled="form.processing || deleteForm.processing" 
+                            @click="resetForm"
+                            :class="['rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50']"
+                        >
                             Cancelar
                         </Button>
                     </div>
-
                 </form>
             </section>
 
-            <!-- MOSTRAR CLIENTES -->
-            <section class="border border-sidebar-border/70 bg-background p-4">
-                <h2 class="text-lg font-semibold">Listado de productos</h2>
+            <!-- Tabla de Productos -->
+            <section class="rounded-xl border border-gray-200 bg-white shadow-sm">
+                <div class="border-b border-gray-200 p-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                                <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-900">Listado de Productos</h2>
+                                <p class="text-sm text-gray-500">{{ products.length }} productos registrados</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2">
+                            <span class="text-sm font-semibold text-blue-700">{{ products.length }}</span>
+                            <span class="text-sm text-blue-600">productos</span>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="mt-4 overflow-x-auto">
-                    <table class="w-full min-w-[720px] text-sm">
-                        <thead class="border-b text-left">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-2 py-2">ID</th>
-                                <th class="px-2 py-2">ID_Categoría</th>
-                                <th class="px-2 py-2">Código</th>
-                                <th class="px-2 py-2">Nombre</th>
-                                <th class="px-2 py-2">Precio unitario</th>
-                                <th class="px-2 py-2">Precio al mayor</th>
-                                <th class="px-2 py-2">Stock</th>
-                                <th class="px-2 py-2">Fecha de vencimiento</th>
-                                <th class="px-2 py-2">Descuento %</th>
-                                <th class="px-2 py-2">Estado</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Producto</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Código</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Categoría</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Precio</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Stock</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Vencimiento</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Estado</th>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="products.length === 0">
-                                <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
-                                    No hay productos registrados.
+                                <td colspan="8" class="px-4 py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <svg class="h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                                        </svg>
+                                        <p class="text-gray-500">No hay productos registrados</p>
+                                    </div>
                                 </td>
                             </tr>
-                            <tr v-for="p in products" :key="p.id" class="border-b">
-                                <td class="px-2 py-2">{{ p.id }}</td>
-                                <td class="px-2 py-2">{{ p.id_categories }}</td>
-                                <td class="px-2 py-2">{{ p.code }}</td>
-                                <td class="px-2 py-2">{{ p.name }}</td>
-                                <td class="px-2 py-2">{{ p.unit_price }}</td>
-                                <td class="px-2 py-2">{{ p.higher_price }}</td>
-                                <td class="px-2 py-2">{{ p.stock }}</td>
-                                <td class="px-2 py-2">{{ p.expiration_date }}</td>
-                                <td class="px-2 py-2">{{ p.promotion_discount }}</td>
-                                <td class="px-2 py-2">{{ p.state }}</td>
-                                <td class="px-2 py-2">
-                                    <div class="flex gap-2">
-                                        <Button type="button" variant="secondary" size="sm"
-                                            :disabled="form.processing || deleteForm.processing" @click="startEdit(p)">
+                            <tr 
+                                v-for="p in products" 
+                                :key="p.id" 
+                                class="border-t border-gray-100 transition-colors hover:bg-gray-50"
+                            >
+                                <td class="px-4 py-3">
+                                    <div>
+                                        <p class="font-semibold text-gray-900">{{ p.name }}</p>
+                                        <p class="text-xs text-gray-500 line-clamp-1">{{ p.description }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">{{ p.code }}</span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">
+                                    {{ categories.find(c => c.id === p.id_categories)?.name || 'Sin categoría' }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div>
+                                        <p class="font-semibold text-gray-900">S/ {{ p.unit_price.toFixed(2) }}</p>
+                                        <p v-if="p.higher_price" class="text-xs text-gray-500">Mayor: S/ {{ p.higher_price.toFixed(2) }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span 
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="p.stock < 10 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'"
+                                    >
+                                        <span :class="p.stock < 10 ? 'bg-red-600' : 'bg-green-600'" class="h-1.5 w-1.5 rounded-full"></span>
+                                        {{ p.stock }} unid.
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 text-gray-600">
+                                    {{ new Date(p.expiration_date).toLocaleDateString('es-PE') }}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <span 
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium"
+                                        :class="p.state === 'active' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'"
+                                    >
+                                        <span :class="p.state === 'active' ? 'bg-blue-600' : 'bg-gray-600'" class="h-1.5 w-1.5 rounded-full"></span>
+                                        {{ p.state === 'active' ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <Button 
+                                            type="button" 
+                                            variant="secondary" 
+                                            size="sm"
+                                            :disabled="form.processing || deleteForm.processing"
+                                            @click="startEdit(p)"
+                                            :class="['rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50']"
+                                        >
                                             Editar
                                         </Button>
-                                        <Button type="button" variant="destructive" size="sm"
-                                            :disabled="form.processing || deleteForm.processing" @click="remove(p)">
+                                        <Button 
+                                            type="button" 
+                                            variant="destructive" 
+                                            size="sm"
+                                            :disabled="form.processing || deleteForm.processing" 
+                                            @click="remove(p)"
+                                            :class="['rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-100 disabled:opacity-50']"
+                                        >
                                             Eliminar
                                         </Button>
                                     </div>
@@ -297,37 +491,9 @@ const remove = (products: Products): void => {
                         </tbody>
                     </table>
                 </div>
-                <InputError :message="deleteError" class="mt-3" />
             </section>
 
         </main>
-
-    </AppLayout>
-
-</template>
-
-    <!-- import { type BreadcrumbItem } from '@/types';
-
-    const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'products',
-        href: './products',
-    },
-];
-</script>
-
-<template>
-
-    <Head title="products" />
-
-    <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="space-y-6 p-4">
-            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
-            </section>
-                hola
-            <section class="rounded-xl border border-sidebar-border/70 bg-background p-4">
-            </section>
-        </div>
     </AppLayout>
 </template>
->>>>>>> ca91998998c9ef5e8dea0e0e1d114c3b708910ba -->
+

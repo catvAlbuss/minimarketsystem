@@ -16,9 +16,10 @@ class CategoryController extends Controller
             'categories' => $category,
         ]);
         //
+        // return Inertia::render('categories/index', [
+        //     'categories' => $categories,
+        // ]);
     }
-
-       
 
     public function store(Request $request)
     {

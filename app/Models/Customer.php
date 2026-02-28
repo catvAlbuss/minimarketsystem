@@ -10,9 +10,6 @@ class Customer extends Model
                 'dni',
                 'name',
                 'last_name',
-
-                'lastname',
-
                 'birthday',
                 'email',
                 'phone',
