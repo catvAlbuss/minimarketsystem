@@ -6,6 +6,7 @@ import { BookOpen, Folder, LayoutGrid, User } from 'lucide-vue-next';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
 import NavUser from '@/components/NavUser.vue';
+import branches from '@/routes/branches';
 import {
     Sidebar,
     SidebarContent,
@@ -21,6 +22,7 @@ import { dashboard } from '@/routes';
 
 // IMPORTAR RUTAS
 import products from '@/routes/products';
+
 import users from '@/routes/users';
 import customers from '@/routes/customers';
 import categories from '@/routes/categories';
@@ -29,7 +31,6 @@ import sale_details from '@/routes/sale_details';
 import providers from '@/routes/providers';
 import promotions from '@/routes/promotions';
 import buys from '@/routes/buys';
-
 
 
 const mainNavItems: NavItem[] = [
@@ -47,6 +48,11 @@ const mainNavItems: NavItem[] = [
         title: 'Productos',
         href: products.index.url(),
         icon: LayoutGrid,
+    },
+
+    {
+        title: 'Sucursales',
+        href: branches.index.url(),
     },
     {
         title: 'Ventas',
@@ -85,6 +91,7 @@ const mainNavItems: NavItem[] = [
 
     },
 ];
+
 </script>
 
 <template>

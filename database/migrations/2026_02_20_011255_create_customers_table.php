@@ -23,7 +23,6 @@ return new class extends Migration
             $table->string('address');
             $table->integer('score')->default(0);
             $table->enum('state', ['active', 'inactive'])->default('active');
-
             $table->timestamps();
         });
     }

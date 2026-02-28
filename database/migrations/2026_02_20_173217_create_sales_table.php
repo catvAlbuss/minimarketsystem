@@ -23,7 +23,6 @@ return new class extends Migration
             $table->enum('voucher', ['ticket', 'invoice']);
             $table->string('document')->nullable();
             $table->timestamp('date_time')->useCurrent();
-
             $table->timestamps();
         });
     }
