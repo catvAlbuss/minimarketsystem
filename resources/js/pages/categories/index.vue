@@ -42,8 +42,9 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
+    editingId.value=null;
     form.reset();
-    deleteForm.reset();
+    form.clearErrors();
 };
 
 const startEdit = (categories: Category): void => {

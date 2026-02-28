@@ -69,6 +69,7 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
+    editingId.value=null;
     form.reset();
     form.clearErrors();
     form.id_categories = props.categories?.[0]?.id ?? '';
@@ -438,8 +439,8 @@ const remove = (products: Products): void => {
                                 </td>
                                 <td class="px-4 py-3">
                                     <div>
-                                        <p class="font-semibold text-gray-900">S/ {{ p.unit_price.toFixed(2) }}</p>
-                                        <p v-if="p.higher_price" class="text-xs text-gray-500">Mayor: S/ {{ p.higher_price.toFixed(2) }}</p>
+                                        <p class="font-semibold text-gray-900">S/ {{ Number(p.unit_price).toFixed(2) }}</p>
+                                        <p v-if="p.higher_price" class="text-xs text-gray-500">Mayor: S/ {{ Number(p.higher_price).toFixed(2) }}</p>
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
