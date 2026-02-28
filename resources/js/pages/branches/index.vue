@@ -1,846 +1,428 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue'
-import { Head } from '@inertiajs/vue3'
-import { ref, reactive, computed, watch } from 'vue'
-import Chart from 'chart.js/auto'
-import { 
-  Computer, Plus, ArrowLeft, Download, UserPlus, 
-  DollarSign, Clock, MapPin, Phone, X
-} from 'lucide-vue-next'
+import { Head, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { type BreadcrumbItem } from '@/types';
+import { computed, ref } from 'vue';
+import InputError from '@/components/InputError.vue';
+import { index as productsIndex } from '@/routes/products';
+import BranchController from '@/actions/App/Http/Controllers/BranchController';
 
-// Types y datos 
-type Branch = {
-  id: number
-  codigo: string
-  nombre: string
-  ruc: string
-  serie: string
-  licencia: string
-  direccion: string
-  horario: string
-  encargado: string
-  telefono: string
-  estado: string
-  ventasHoy: number
-  ventasMensual: number
-  ticketPromedio: number
-  tasaMerma: number
-  cajaApertura: number
-  cajaActual: number
-  personal: any[]
-  stock: any[]
-  ventasSemanales: number[]
-  productosEstrella: { nombre: string; ventas: number }[]
-  cajaMovimientos: any[]
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Sucursales',
+        href: '/branches',
+    },
+];
+
+type Users = {
+    id: number;
+    name: string;
 }
 
-const props = defineProps<{ branches?: Branch[] }>()
+type Branches = {
+    id: number;
+    id_users: number | null;
+    name: string;
+    address: string;
+    opening_time: string;
+    closing_time: string;
+    state: string;
+};
 
-// Datos de ejemplo (simulan la respuesta del backend)
-const sucursalesDB = ref<Branch[]>([
-  {
-    id: 1,
-    codigo: "SUC-01-AMA",
-    nombre: "NetMarket Amarillis",
-    ruc: "20555666777",
-    serie: "F001",
-    licencia: "Vigente",
-    direccion: "Av. Universitaria 123, Amarillis",
-    horario: "08:00 AM - 10:00 PM",
-    encargado: "Juan Pérez",
-    telefono: "987654321",
-    estado: "Abierto",
-    ventasHoy: 723.3,
-    ventasMensual: 6120.2,
-    ticketPromedio: 25.5,
-    tasaMerma: 2.3,
-    cajaApertura: 500,
-    cajaActual: 1245.5,
-    personal: [
-      { nombre: "Juan Pérez", cargo: "Encargado", contacto: "987654321", turno: "Mañana", estado: "Activo" },
-      { nombre: "María López", cargo: "Cajera", contacto: "912345678", turno: "Mañana", estado: "Activo" },
-      { nombre: "Carlos Ruiz", cargo: "Reponedor", contacto: "923456789", turno: "Tarde", estado: "Activo" }
-    ],
-    stock: [
-      { producto: "Arroz Costeño 1kg", actual: 45, minimo: 50, estado: "Bajo", reposicion: "15/02/2026" },
-      { producto: "Leche Gloria 1L", actual: 120, minimo: 100, estado: "Normal", reposicion: "14/02/2026" },
-      { producto: "Aceite Primor 1L", actual: 30, minimo: 40, estado: "Bajo", reposicion: "13/02/2026" },
-      { producto: "Coca Cola 3L", actual: 85, minimo: 50, estado: "Normal", reposicion: "15/02/2026" }
-    ],
-    ventasSemanales: [650, 720, 580, 890, 950, 1200, 850],
-    productosEstrella: [
-      { nombre: "Arroz Costeño", ventas: 145 },
-      { nombre: "Leche Gloria", ventas: 132 },
-      { nombre: "Coca Cola 3L", ventas: 98 },
-      { nombre: "Pan Bimbo", ventas: 87 },
-      { nombre: "Huevos (30 un)", ventas: 76 }
-    ],
-    cajaMovimientos: [
-      { fecha: "15/02/2026 08:00", tipo: "Apertura", monto: 500, responsable: "Juan Pérez", estado: "Completado" },
-      { fecha: "15/02/2026 12:30", tipo: "Venta", monto: 245.5, responsable: "María López", estado: "Completado" },
-      { fecha: "15/02/2026 15:00", tipo: "Retiro", monto: 100, responsable: "Juan Pérez", estado: "Completado" }
-    ]
-  },
-  {
-    id: 2,
-    codigo: "SUC-02-HUA",
-    nombre: "NetMarket Huánuco",
-    ruc: "20555666888",
-    serie: "F002",
-    licencia: "Vigente",
-    direccion: "Jr. Lima 456, Huánuco Centro",
-    horario: "07:00 AM - 11:00 PM",
-    encargado: "Ana Torres",
-    telefono: "912345678",
-    estado: "Abierto",
-    ventasHoy: 892.5,
-    ventasMensual: 6540.1,
-    ticketPromedio: 28.3,
-    tasaMerma: 1.8,
-    cajaApertura: 600,
-    cajaActual: 1567.8,
-    personal: [
-      { nombre: "Ana Torres", cargo: "Encargada", contacto: "912345678", turno: "Mañana", estado: "Activo" },
-      { nombre: "Luis García", cargo: "Cajero", contacto: "923456780", turno: "Tarde", estado: "Activo" },
-      { nombre: "Carmen Díaz", cargo: "Reponedora", contacto: "934567891", turno: "Noche", estado: "Activo" }
-    ],
-    stock: [
-      { producto: "Arroz Costeño 1kg", actual: 78, minimo: 50, estado: "Normal", reposicion: "14/02/2026" },
-      { producto: "Leche Gloria 1L", actual: 45, minimo: 50, estado: "Bajo", reposicion: "12/02/2026" },
-      { producto: "Aceite Primor 1L", actual: 65, minimo: 40, estado: "Normal", reposicion: "15/02/2026" },
-      { producto: "Coca Cola 3L", actual: 92, minimo: 50, estado: "Normal", reposicion: "15/02/2026" }
-    ],
-    ventasSemanales: [720, 850, 690, 920, 1050, 1340, 892],
-    productosEstrella: [
-      { nombre: "Leche Gloria", ventas: 167 },
-      { nombre: "Arroz Costeño", ventas: 154 },
-      { nombre: "Pan Bimbo", ventas: 112 },
-      { nombre: "Coca Cola 3L", ventas: 95 },
-      { nombre: "Aceite Primor", ventas: 88 }
-    ],
-    cajaMovimientos: [
-      { fecha: "15/02/2026 07:00", tipo: "Apertura", monto: 600, responsable: "Ana Torres", estado: "Completado" },
-      { fecha: "15/02/2026 11:45", tipo: "Venta", monto: 312.3, responsable: "Luis García", estado: "Completado" },
-      { fecha: "15/02/2026 16:20", tipo: "Venta", monto: 278.8, responsable: "Luis García", estado: "Completado" }
-    ]
-  },
-  {
-    id: 3,
-    codigo: "SUC-03-CAY",
-    nombre: "NetMarket Cayhuayna",
-    ruc: "20555666999",
-    serie: "F003",
-    licencia: "Vigente",
-    direccion: "Calle Los Pinos 789, Cayhuayna",
-    horario: "08:00 AM - 09:00 PM",
-    encargado: "Roberto Díaz",
-    telefono: "955444333",
-    estado: "Abierto",
-    ventasHoy: 567.8,
-    ventasMensual: 5660.1,
-    ticketPromedio: 22.1,
-    tasaMerma: 3.1,
-    cajaApertura: 400,
-    cajaActual: 987.3,
-    personal: [
-      { nombre: "Roberto Díaz", cargo: "Encargado", contacto: "955444333", turno: "Mañana", estado: "Activo" },
-      { nombre: "Patricia Mendoza", cargo: "Cajera", contacto: "966555444", turno: "Tarde", estado: "Activo" }
-    ],
-    stock: [
-      { producto: "Arroz Costeño 1kg", actual: 25, minimo: 40, estado: "Crítico", reposicion: "10/02/2026" },
-      { producto: "Leche Gloria 1L", actual: 58, minimo: 50, estado: "Normal", reposicion: "14/02/2026" },
-      { producto: "Aceite Primor 1L", actual: 18, minimo: 30, estado: "Crítico", reposicion: "11/02/2026" },
-      { producto: "Coca Cola 3L", actual: 42, minimo: 40, estado: "Normal", reposicion: "15/02/2026" }
-    ],
-    ventasSemanales: [520, 610, 480, 720, 850, 980, 567],
-    productosEstrella: [
-      { nombre: "Arroz Costeño", ventas: 98 },
-      { nombre: "Coca Cola 3L", ventas: 87 },
-      { nombre: "Pan Bimbo", ventas: 76 },
-      { nombre: "Leche Gloria", ventas: 65 },
-      { nombre: "Galletas Oreo", ventas: 54 }
-    ],
-    cajaMovimientos: [
-      { fecha: "15/02/2026 08:00", tipo: "Apertura", monto: 400, responsable: "Roberto Díaz", estado: "Completado" },
-      { fecha: "15/02/2026 13:15", tipo: "Venta", monto: 199, responsable: "Patricia Mendoza", estado: "Completado" }
-    ]
-  }
-])
+type Props = {
+    branches: Branches[];
+    users: Users[];
+};
 
-// Estado de la vista
-const selectedBranchId = ref<number | null>(null)
-const showModalSucursal = ref(false)
-const showModalPersonal = ref(false)
-const showModalCaja = ref(false)
-const editingBranch = ref<Branch | null>(null)
+const props = defineProps<Props>();
+const branches = computed(() => props.branches);
+const users = computed(() => props.users);
 
-// Formularios reactivos
-const formSucursal = reactive({
-  id: null as number | null,
-  codigo: '',
-  nombre: '',
-  ruc: '',
-  serie: '',
-  direccion: '',
-  horaApertura: '',
-  horaCierre: '',
-  encargado: '',
-  telefono: ''
-})
+const editingId = ref<number | null>(null);
 
-const nuevoPersonal = reactive({
-  nombre: '',
-  cargo: '',
-  contacto: '',
-  turno: 'Mañana'
-})
+const form = useForm({
+    id_users: props.users?.[0]?.id ?? '',
+    address: '',
+    name: '',
+    opening_time: '',
+    closing_time: '',
+    state: '',
+});
 
-const nuevoMovimiento = reactive({
-  tipo: 'Venta',
-  monto: 0,
-  responsable: ''
-})
+const deleteForm = useForm({});
+const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
 
-// Gráficos
-let ventasChart: Chart | null = null
-let productosChart: Chart | null = null
+const isEditing = computed(() => editingId.value !== null);
 
-// Sucursal seleccionada
-const sucursalSeleccionada = computed(() => {
-  if (!selectedBranchId.value) return null
-  return sucursalesDB.value.find(s => s.id === selectedBranchId.value) || null
-})
+// KPIs Computados
+const totalSucursales = computed(() => branches.value.length);
+const sucursalesActivas = computed(() => branches.value.filter(b => b.state === 'active').length);
+const usuariosAsignados = computed(() => new Set(branches.value.map(b => b.id_users).filter(id => id !== null)).size);
 
-// KPIs globales
-const totalSucursales = computed(() => sucursalesDB.value.length)
-const totalAlertasStock = computed(() => {
-  return sucursalesDB.value.reduce((acc, s) => acc + s.stock.filter(st => st.actual <= st.minimo).length, 0)
-})
-const totalPersonalActivo = computed(() => {
-  return sucursalesDB.value.reduce((acc, s) => acc + s.personal.length, 0)
-})
+const resetForm = (): void => {
+    editingId.value = null;
+    form.reset();
+    form.clearErrors();
+    form.id_users = props.users?.[0]?.id ?? '';
+};
 
-// Métodos
-function verDetalleSucursal(id: number) {
-  selectedBranchId.value = id
-}
+const startEdit = (branch: Branches): void => {
+    editingId.value = branch.id;
+    form.clearErrors();
+    form.id_users = branch.id_users ?? props.users?.[0]?.id ?? '';
+    form.name = branch.name;
+    form.address = branch.address;
+    form.opening_time = branch.opening_time;
+    form.closing_time = branch.closing_time;
+    form.state = branch.state;
+};
 
-function volverASucursales() {
-  selectedBranchId.value = null
-}
-
-function prepararModalCrear() {
-  editingBranch.value = null
-  Object.assign(formSucursal, {
-    id: null,
-    codigo: `SUC-00${sucursalesDB.value.length + 1}`,
-    nombre: '',
-    ruc: '',
-    serie: '',
-    direccion: '',
-    horaApertura: '',
-    horaCierre: '',
-    encargado: '',
-    telefono: ''
-  })
-  showModalSucursal.value = true
-}
-
-function prepararModalEditar(branch: Branch) {
-  editingBranch.value = branch
-  Object.assign(formSucursal, {
-    id: branch.id,
-    codigo: branch.codigo,
-    nombre: branch.nombre,
-    ruc: branch.ruc,
-    serie: branch.serie,
-    direccion: branch.direccion,
-    horaApertura: branch.horario.split(' - ')[0],
-    horaCierre: branch.horario.split(' - ')[1],
-    encargado: branch.encargado,
-    telefono: branch.telefono
-  })
-  showModalSucursal.value = true
-}
-
-function guardarSucursal() {
-  if (editingBranch.value) {
-    // Editar
-    const index = sucursalesDB.value.findIndex(s => s.id === editingBranch.value!.id)
-    if (index !== -1) {
-      sucursalesDB.value[index] = {
-        ...sucursalesDB.value[index],
-        codigo: formSucursal.codigo,
-        nombre: formSucursal.nombre,
-        ruc: formSucursal.ruc,
-        serie: formSucursal.serie,
-        direccion: formSucursal.direccion,
-        horario: `${formSucursal.horaApertura} - ${formSucursal.horaCierre}`,
-        encargado: formSucursal.encargado,
-        telefono: formSucursal.telefono
-      }
+const submit = (): void => {
+    const options = {
+        preserveScroll: true,
+        onSuccess: () => resetForm(),
+    };
+    if (isEditing.value && editingId.value !== null) {
+        form.put(BranchController.update.url(editingId.value), options);
+        return;
     }
-  } else {
-    // Crear nueva
-    const newId = Math.max(...sucursalesDB.value.map(s => s.id)) + 1
-    sucursalesDB.value.push({
-      id: newId,
-      codigo: formSucursal.codigo,
-      nombre: formSucursal.nombre,
-      ruc: formSucursal.ruc,
-      serie: formSucursal.serie,
-      licencia: 'Vigente',
-      direccion: formSucursal.direccion,
-      horario: `${formSucursal.horaApertura} - ${formSucursal.horaCierre}`,
-      encargado: formSucursal.encargado,
-      telefono: formSucursal.telefono,
-      estado: 'Abierto',
-      ventasHoy: 0,
-      ventasMensual: 0,
-      ticketPromedio: 0,
-      tasaMerma: 0,
-      cajaApertura: 0,
-      cajaActual: 0,
-      personal: [],
-      stock: [],
-      ventasSemanales: [0, 0, 0, 0, 0, 0, 0],
-      productosEstrella: [],
-      cajaMovimientos: []
-    })
-  }
-  showModalSucursal.value = false
-}
+    form.post(BranchController.store.url(), options);
+};
 
-function abrirModalAsignarPersonal() {
-  if (!sucursalSeleccionada.value) return
-  nuevoPersonal.nombre = ''
-  nuevoPersonal.cargo = ''
-  nuevoPersonal.contacto = ''
-  nuevoPersonal.turno = 'Mañana'
-  showModalPersonal.value = true
-}
-
-function confirmarAsignacionPersonal() {
-  const { nombre, cargo, contacto, turno } = nuevoPersonal
-  if (!nombre || !cargo || !contacto) {
-    alert('Por favor complete todos los campos obligatorios')
-    return
-  }
-  const sucursal = sucursalSeleccionada.value
-  if (sucursal) {
-    sucursal.personal.push({
-      nombre,
-      cargo,
-      contacto,
-      turno,
-      estado: 'Activo'
-    })
-    showModalPersonal.value = false
-  }
-}
-
-function abrirModalMovimientoCaja() {
-  if (!sucursalSeleccionada.value) return
-  nuevoMovimiento.tipo = 'Venta'
-  nuevoMovimiento.monto = 0
-  nuevoMovimiento.responsable = ''
-  showModalCaja.value = true
-}
-
-function confirmarMovimientoCaja() {
-  const { tipo, monto, responsable } = nuevoMovimiento
-  if (!monto || !responsable) {
-    alert('Por favor complete todos los campos')
-    return
-  }
-  const sucursal = sucursalSeleccionada.value
-  if (sucursal) {
-    sucursal.cajaMovimientos.push({
-      fecha: new Date().toLocaleString('es-PE'),
-      tipo,
-      monto,
-      responsable,
-      estado: 'Completado'
-    })
-    if (tipo === 'Venta' || tipo === 'Apertura') {
-      sucursal.cajaActual += monto
-    } else {
-      sucursal.cajaActual -= monto
-    }
-    showModalCaja.value = false
-  }
-}
-
-function generarReporteReposicion() {
-  alert('📄 Generando reporte de reposición de stock...')
-}
-
-function eliminarSucursal(id: number) {
-  if (confirm('¿Eliminar sucursal?')) {
-    sucursalesDB.value = sucursalesDB.value.filter(s => s.id !== id)
-    if (selectedBranchId.value === id) volverASucursales()
-  }
-}
-
-// Inicializar gráficos al cambiar de sucursal
-watch(sucursalSeleccionada, (sucursal) => {
-  if (!sucursal) return
-  setTimeout(() => {
-    const canvasVentas = document.getElementById('graficoVentasSucursal') as HTMLCanvasElement
-    const canvasProductos = document.getElementById('graficoProductosEstrella') as HTMLCanvasElement
-
-    if (ventasChart) ventasChart.destroy()
-    if (productosChart) productosChart.destroy()
-
-    if (canvasVentas) {
-      ventasChart = new Chart(canvasVentas, {
-        type: 'line',
-        data: {
-          labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
-          datasets: [{
-            label: 'Ventas (S/)',
-            data: sucursal.ventasSemanales,
-            borderColor: '#2b4485',
-            backgroundColor: 'rgba(43,68,133,0.1)',
-            tension: 0.4,
-            fill: true
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      })
+const remove = (branch: Branches): void => {
+    if (!confirm(`Eliminar sucursal "${branch.name}"?`)) {
+        return;
     }
 
-    if (canvasProductos) {
-      productosChart = new Chart(canvasProductos, {
-        type: 'bar',
-        data: {
-          labels: sucursal.productosEstrella.map(p => p.nombre),
-          datasets: [{
-            label: 'Unidades Vendidas',
-            data: sucursal.productosEstrella.map(p => p.ventas),
-            backgroundColor: ['#2b4485', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
-            borderRadius: 5
-          }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      })
-    }
-  }, 100)
-})
-
-const breadcrumbs = [
-  { title: 'Sucursales', href: '/branches', icon: Computer },
-]
+    deleteForm.delete(BranchController.destroy.url(branch.id), {
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
-  <Head title="Sucursales - NetMarket" />
+    <Head title="Sucursales" />
 
-  <AppLayout :breadcrumbs="breadcrumbs">
-    <div class="p-6 space-y-6 bg-gray-100 min-h-screen text-gray-900">
-
-      <!-- Vista de lista de sucursales -->
-      <div v-if="!selectedBranchId" class="space-y-6">
-        <!-- Header con botón nueva sucursal -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm">
-          <div>
-            <h1 class="text-2xl font-bold text-gray-800">Gestión de Sucursales</h1>
-            <p class="text-sm text-gray-500">Administra las ubicaciones físicas de tu minimarket</p>
-          </div>
-          <button @click="prepararModalCrear" class="flex items-center gap-2 bg-[#2b4485] hover:bg-[#1a3366] text-white px-4 py-2 rounded-lg transition-colors font-medium">
-            <Plus :size="18" />
-            Nueva Sucursal
-          </button>
-        </div>
-
-        <!-- KPIs globales -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Total Sucursales -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Total Sucursales</p>
-            <h3 class="text-3xl font-bold text-gray-900">{{ totalSucursales }}</h3>
-          </div>
-          <!-- Ventas Totales (Mes) -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Ventas Totales (Mes)</p>
-            <h3 class="text-3xl font-bold text-gray-900">S/ 18,320</h3>
-          </div>
-          <!-- Alertas de Stock -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Alertas de Stock</p>
-            <h3 class="text-3xl font-bold text-gray-900">{{ totalAlertasStock }}</h3>
-          </div>
-          <!-- Personal Activo -->
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Personal Activo</p>
-            <h3 class="text-3xl font-bold text-gray-900">{{ totalPersonalActivo }}</h3>
-          </div>
-        </div>
-
-        <!-- Tarjetas de sucursales -->
-         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div v-for="branch in sucursalesDB" :key="branch.id" @click="verDetalleSucursal(branch.id)" class="bg-white rounded-2xl p-5 border-2 border-transparent hover:border-[#2b4485] hover:-translate-y-2 transition-all shadow-sm hover:shadow-xl cursor-pointer">
-            <div class="flex justify-between items-start mb-3">
-              <div>
-                <h5 class="text-lg font-bold text-gray-800 mb-1">{{ branch.nombre }}</h5>
-                <p class="text-xs text-gray-500">{{ branch.codigo }}</p>
-              </div>
-              <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="branch.estado === 'Abierto' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ branch.estado }}</span>
-            </div>
-            <p class="text-sm text-gray-600 mb-3 flex items-center gap-1">
-              <MapPin :size="14" class="text-gray-400" /> {{ branch.direccion }}
-            </p>
-            <div class="grid grid-cols-2 gap-2 mb-3">
-              <div class="bg-gray-50 p-3 rounded-lg transition-all">
-                <div class="text-xs text-gray-500 font-medium mb-1">Venta Hoy</div>
-                <div class="text-xl font-bold text-gray-800">S/ {{ branch.ventasHoy.toFixed(2) }}</div>
-              </div>
-              <div class="bg-gray-50 p-3 rounded-lg transition-all">
-                <div class="text-xs text-gray-500 font-medium mb-1">Personal</div>
-                <div class="text-xl font-bold text-gray-800">{{ branch.personal.length }}</div>
-              </div>
-            </div>
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-gray-500 flex items-center gap-1"><Clock :size="12" /> {{ branch.horario }}</span>
-              <span v-if="branch.stock.filter(s => s.actual <= s.minimo).length > 0" class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 flex items-center gap-1 animate-pulse">
-                <span class="animate-pulse">●</span> {{ branch.stock.filter(s => s.actual <= s.minimo).length }} Alertas
-              </span>
-              <span v-else class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">OK</span>
-            </div>
-          </div>
-        </div>
-      </div>
-        
-
-
-
-      <!-- Vista detallada de sucursal -->
-      <div v-else-if="sucursalSeleccionada" class="space-y-6">
-        <!-- Cabecera con volver -->
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex items-center gap-4">
-            <button @click="volverASucursales" class="p-2 hover:bg-gray-100 rounded-lg transition">
-              <ArrowLeft class="w-5 h-5 text-gray-600" />
-            </button>
-            <div>
-              <h2 class="text-2xl font-bold text-gray-900">{{ sucursalSeleccionada.nombre }}</h2>
-              <div class="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-600">
-                <span class="flex items-center gap-1"><MapPin :size="14" /> {{ sucursalSeleccionada.direccion }}</span>
-                <span class="flex items-center gap-1"><Phone :size="14" /> {{ sucursalSeleccionada.telefono }}</span>
-                <span class="flex items-center gap-1"><Clock :size="14" /> {{ sucursalSeleccionada.horario }}</span>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="sucursalSeleccionada.estado === 'Abierto' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">{{ sucursalSeleccionada.estado }}</span>
-              </div>
-              <p class="text-xs text-gray-400 mt-1">{{ sucursalSeleccionada.codigo }} | RUC: {{ sucursalSeleccionada.ruc }} | Licencia: {{ sucursalSeleccionada.licencia }}</p>
-            </div>
-          </div>
-        </div>
-
-
-        <!-- KPIs específicos -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Venta Hoy</p>
-            <h3 class="text-3xl font-bold text-gray-900">S/ {{ sucursalSeleccionada.ventasHoy.toFixed(2) }}</h3>
-          </div>
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Venta Mensual</p>
-            <h3 class="text-3xl font-bold text-gray-900">S/ {{ sucursalSeleccionada.ventasMensual.toFixed(2) }}</h3>
-          </div>
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Ticket Promedio</p>
-            <h3 class="text-3xl font-bold text-gray-900">S/ {{ sucursalSeleccionada.ticketPromedio.toFixed(2) }}</h3>
-          </div>
-          <div class="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition-all min-h-[110px] flex flex-col justify-center">
-            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-2">Tasa de Merma</p>
-            <h3 class="text-3xl font-bold text-gray-900">{{ sucursalSeleccionada.tasaMerma }}%</h3>
-          </div>
-        </div>
-        
-
-        <!-- Gráficos -->
-         <!-- 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all h-[420px] flex flex-col">
-            <div class="mb-4 pb-2 border-b border-gray-200 flex-shrink-0">
-              <h4 class="text-sm font-semibold text-gray-700 m-0">Ventas Últimos 7 Días</h4>
-            </div>
-            <div class="h-[320px] relative flex-1">
-              <canvas id="graficoVentasSucursal"></canvas>
-            </div>
-          </div>
-          <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all h-[420px] flex flex-col">
-            <div class="mb-4 pb-2 border-b border-gray-200 flex-shrink-0">
-              <h4 class="text-sm font-semibold text-gray-700 m-0">Productos Más Vendidos</h4>
-            </div>
-            <div class="h-[320px] relative flex-1">
-              <canvas id="graficoProductosEstrella"></canvas>
-            </div>
-          </div>
-        </div>
-        -->
-
-
-        <!-- Personal Asignado -->
-         <!-- 
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h3 class="font-semibold text-gray-900 flex items-center gap-2"><UserPlus :size="18" class="text-[#2b4485]" /> Personal Asignado</h3>
-            <button @click="abrirModalAsignarPersonal" class="text-sm bg-[#2b4485] text-white px-3 py-1 rounded-lg hover:bg-[#1a3366]">Agregar</button>
-          </div>
-          <div class="p-6 overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50 text-gray-700">
-                <tr><th class="p-3 text-left">Empleado</th><th class="p-3 text-left">Cargo</th><th class="p-3 text-left">Contacto</th><th class="p-3 text-left">Turno</th><th class="p-3 text-left">Estado</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="(p, idx) in sucursalSeleccionada.personal" :key="idx" class="border-t">
-                  <td class="p-3 flex items-center gap-2">
-                    <div class="w-8 h-8 bg-[#2b4485] text-white rounded-full flex items-center justify-center text-xs font-bold">{{ p.nombre.charAt(0) }}</div>
-                    {{ p.nombre }}
-                  </td>
-                  <td class="p-3">{{ p.cargo }}</td>
-                  <td class="p-3"><a :href="`https://wa.me/51${p.contacto}`" class="text-green-600">📱 {{ p.contacto }}</a></td>
-                  <td class="p-3">{{ p.turno }}</td>
-                  <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Activo</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        -->
-
-
-
-        <!-- Stock y Alertas -->
-         <!-- 
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h3 class="font-semibold text-gray-900 flex items-center gap-2"><DollarSign :size="18" class="text-[#2b4485]" /> Stock en Tiempo Real</h3>
-            <div class="flex items-center gap-3">
-              <span class="text-sm bg-red-100 text-red-700 px-3 py-1 rounded-full">{{ sucursalSeleccionada.stock.filter(s => s.actual <= s.minimo).length }} Alertas</span>
-              <button @click="generarReporteReposicion" class="text-sm bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 flex items-center gap-1"><Download :size="14" /> Reporte</button>
-            </div>
-          </div>
-          <div class="p-6 overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50 text-gray-700">
-                <tr><th class="p-3 text-left">Producto</th><th class="p-3 text-left">Stock Actual</th><th class="p-3 text-left">Stock Mínimo</th><th class="p-3 text-left">Estado</th><th class="p-3 text-left">Última Reposición</th><th class="p-3 text-left">Acción</th></tr>
-              </thead>
-              <tbody>
-                <tr v-for="(s, idx) in sucursalSeleccionada.stock" :key="idx" class="border-t" :class="{'bg-red-50': s.actual <= s.minimo}">
-                  <td class="p-3">{{ s.producto }}</td>
-                  <td class="p-3" :class="{'font-bold text-red-600': s.actual <= s.minimo}">{{ s.actual }}</td>
-                  <td class="p-3">{{ s.minimo }}</td>
-                  <td class="p-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold" :class="s.actual <= s.minimo ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'">{{ s.estado }}</span>
-                  </td>
-                  <td class="p-3">{{ s.reposicion }}</td>
-                  <td class="p-3">
-                    <button v-if="s.actual <= s.minimo" class="text-sm bg-orange-500 text-white px-2 py-1 rounded hover:bg-orange-600">Pedir</button>
-                    <span v-else>-</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        -->
-
-
-      
-        <!-- Caja y Finanzas -->
-         <!-- -->
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-6 py-4 border-b flex justify-between items-center">
-            <h3 class="font-semibold text-gray-900 flex items-center gap-2"><DollarSign :size="18" class="text-[#2b4485]" /> Caja y Finanzas</h3>
-            <button @click="abrirModalMovimientoCaja" class="text-sm bg-[#2b4485] text-white px-3 py-1 rounded-lg hover:bg-[#1a3366]">Registrar Movimiento</button>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div class="bg-gray-50 p-3 rounded-lg">
-                <div class="text-xs text-gray-500 font-medium mb-1">Caja Apertura</div>
-                <div class="text-xl font-bold text-green-600">S/ {{ sucursalSeleccionada.cajaApertura.toFixed(2) }}</div>
-              </div>
-              <div class="bg-gray-50 p-3 rounded-lg">
-                <div class="text-xs text-gray-500 font-medium mb-1">Caja Actual</div>
-                <div class="text-xl font-bold text-[#2b4485]">S/ {{ sucursalSeleccionada.cajaActual.toFixed(2) }}</div>
-              </div>
-              <div class="bg-gray-50 p-3 rounded-lg">
-                <div class="text-xs text-gray-500 font-medium mb-1">Cierre Estimado</div>
-                <div class="text-xl font-bold text-yellow-600">S/ {{ (sucursalSeleccionada.cajaActual * 1.2).toFixed(2) }}</div>
-              </div>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-gray-700">
-                  <tr><th class="p-3 text-left">Fecha</th><th class="p-3 text-left">Tipo</th><th class="p-3 text-left">Monto</th><th class="p-3 text-left">Responsable</th><th class="p-3 text-left">Estado</th></tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(m, idx) in sucursalSeleccionada.cajaMovimientos" :key="idx" class="border-t">
-                    <td class="p-3">{{ m.fecha }}</td>
-                    <td class="p-3">
-                      <span class="px-2 py-1 rounded-full text-xs font-semibold" :class="m.tipo === 'Apertura' ? 'bg-green-100 text-green-700' : m.tipo === 'Venta' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'">{{ m.tipo }}</span>
-                    </td>
-                    <td class="p-3 font-bold">S/ {{ m.monto.toFixed(2) }}</td>
-                    <td class="p-3">{{ m.responsable }}</td>
-                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">{{ m.estado }}</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
-
-
-      <!-- MODALES (sin cambios, solo clases utilitarias) -->
-      <!-- Modal Nueva/Editar Sucursal -->
-      
-      <div v-if="showModalSucursal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showModalSucursal = false">
-        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-          <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-900">{{ editingBranch ? 'Editar Sucursal' : 'Nueva Sucursal' }}</h3>
-            <button @click="showModalSucursal = false" class="p-2 hover:bg-gray-100 rounded-lg"><X :size="20" /></button>
-          </div>
-          <div class="p-6">
-            <form @submit.prevent="guardarSucursal" class="space-y-4">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Comercial *</label>
-                  <input v-model="formSucursal.nombre" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]" required>
+    <AppLayout :breadcrumbs="breadcrumbs">
+        <!-- Main Content -->
+        <main class="min-h-screen bg-gray-50 p-6">
+            <div class="mx-auto max-w-7xl">
+                
+                <!-- Header -->
+                <div class="mb-6 flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">Gestión de Sucursales</h1>
+                        
+                    </div>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Código Interno *</label>
-                  <input v-model="formSucursal.codigo" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]" required>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">RUC</label>
-                  <input v-model="formSucursal.ruc" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Serie de Facturación</label>
-                  <input v-model="formSucursal.serie" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Dirección Completa</label>
-                <input v-model="formSucursal.direccion" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]" required>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Horario Apertura</label>
-                  <input v-model="formSucursal.horaApertura" type="time" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Horario Cierre</label>
-                  <input v-model="formSucursal.horaCierre" type="time" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Encargado de Tienda</label>
-                <input v-model="formSucursal.encargado" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                <input v-model="formSucursal.telefono" type="tel" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#2b4485] focus:border-[#2b4485]">
-              </div>
-              <div class="flex justify-end gap-3 pt-4">
-                <button type="button" @click="showModalSucursal = false" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                <button type="submit" class="px-6 py-2 bg-[#2b4485] text-white rounded-lg hover:bg-[#1a3366]">Guardar Sucursal</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
 
-      <!-- Modal Asignar Personal -->
-       <!-- 
-      <div v-if="showModalPersonal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showModalPersonal = false">
-        <div class="bg-white rounded-xl max-w-md w-full">
-          <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-900">Asignar Personal</h3>
-            <button @click="showModalPersonal = false" class="p-2 hover:bg-gray-100 rounded-lg"><X :size="20" /></button>
-          </div>
-          <div class="p-6">
-            <form @submit.prevent="confirmarAsignacionPersonal" class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                <input v-model="nuevoPersonal.nombre" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Cargo *</label>
-                <select v-model="nuevoPersonal.cargo" class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-                  <option value="">Seleccione...</option>
-                  <option value="Encargado">Encargado</option>
-                  <option value="Cajero">Cajero</option>
-                  <option value="Reponedor">Reponedor</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp *</label>
-                <input v-model="nuevoPersonal.contacto" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="987654321" required>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Turno *</label>
-                <select v-model="nuevoPersonal.turno" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                  <option value="Mañana">Mañana</option>
-                  <option value="Tarde">Tarde</option>
-                  <option value="Noche">Noche</option>
-                </select>
-              </div>
-              <div class="flex justify-end gap-3 pt-4">
-                <button type="button" @click="showModalPersonal = false" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                <button type="submit" class="px-6 py-2 bg-[#2b4485] text-white rounded-lg hover:bg-[#1a3366]">Agregar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      -->
+                <!-- KPIs Cards -->
+                <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <!-- Total Sucursales -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Total Sucursales</p>
+                                <h3 class="mt-1 text-3xl font-bold text-gray-900">{{ totalSucursales }}</h3>
+                            </div>
+                            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
+                                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Sucursales Activas -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Sucursales Activas</p>
+                                <h3 class="mt-1 text-3xl font-bold text-emerald-600">{{ sucursalesActivas }}</h3>
+                            </div>
+                            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-50">
+                                <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-      <!-- Modal Movimiento de Caja -->
-        <!-- 
-      <div v-if="showModalCaja" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="showModalCaja = false">
-        <div class="bg-white rounded-xl max-w-md w-full">
-          <div class="p-6 border-b flex justify-between items-center">
-            <h3 class="text-xl font-bold text-gray-900">Registrar Movimiento</h3>
-            <button @click="showModalCaja = false" class="p-2 hover:bg-gray-100 rounded-lg"><X :size="20" /></button>
-          </div>
-          <div class="p-6">
-            <form @submit.prevent="confirmarMovimientoCaja" class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Tipo *</label>
-                <select v-model="nuevoMovimiento.tipo" class="w-full border border-gray-300 rounded-lg px-4 py-2">
-                  <option value="Venta">Venta</option>
-                  <option value="Retiro">Retiro</option>
-                  <option value="Gasto">Gasto</option>
-                  <option value="Apertura">Apertura</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Monto (S/) *</label>
-                <input v-model.number="nuevoMovimiento.monto" type="number" step="0.01" class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Responsable *</label>
-                <input v-model="nuevoMovimiento.responsable" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-2" required>
-              </div>
-              <div class="flex justify-end gap-3 pt-4">
-                <button type="button" @click="showModalCaja = false" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</button>
-                <button type="submit" class="px-6 py-2 bg-[#2b4485] text-white rounded-lg hover:bg-[#1a3366]">Registrar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-        -->
+                    <!-- Usuarios Asignados -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Usuarios Asignados</p>
+                                <h3 class="mt-1 text-3xl font-bold text-purple-600">{{ usuariosAsignados }}</h3>
+                            </div>
+                            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-50">
+                                <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
 
-    </div>
-  </AppLayout>
+                    <!-- Horario Promedio -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-600">Horario Promedio</p>
+                                <h3 class="mt-1 text-3xl font-bold text-orange-600">8h</h3>
+                            </div>
+                            <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-50">
+                                <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de Sucursal -->
+                <section class="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <div class="mb-5 flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                            <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-900">
+                            {{ isEditing ? 'Editar Sucursal' : 'Nueva Sucursal' }}
+                        </h2>
+                    </div>
+
+                    <form class="grid gap-5 md:grid-cols-2" @submit.prevent="submit">
+                        <!-- Usuario - SELECT -->
+                        <div class="space-y-2">
+                            <Label for="id_users" class="text-sm font-medium text-gray-700">Usuario</Label>
+                            <select 
+                                id="id_users" 
+                                v-model="form.id_users" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            >
+                                <option value="" disabled>Seleccione un usuario</option>
+                                <option v-for="user in users" :key="user.id" :value="user.id">
+                                    {{ user.name }}
+                                </option>
+                            </select>
+                            <InputError :message="form.errors.id_users" />
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="space-y-2">
+                            <Label for="name" class="text-sm font-medium text-gray-700">Nombre</Label>
+                            <input 
+                                id="name" 
+                                v-model="form.name" 
+                                type="text" 
+                                placeholder="Ej: Sucursal Centro" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            />
+                            <InputError :message="form.errors.name" />
+                        </div>
+
+                        <!-- Dirección (ocupa las 2 columnas) -->
+                        <div class="space-y-2 md:col-span-2">
+                            <Label for="address" class="text-sm font-medium text-gray-700">Dirección</Label>
+                            <input 
+                                id="address" 
+                                v-model="form.address" 
+                                type="text" 
+                                placeholder="Ej: Av. Principal 123" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            />
+                            <InputError :message="form.errors.address" />
+                        </div>
+
+                        <!-- Hora apertura -->
+                        <div class="space-y-2">
+                            <Label for="opening_time" class="text-sm font-medium text-gray-700">Hora Apertura</Label>
+                            <input 
+                                id="opening_time" 
+                                v-model="form.opening_time" 
+                                type="time" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            />
+                            <InputError :message="form.errors.opening_time" />
+                        </div>
+
+                        <!-- Hora cierre -->
+                        <div class="space-y-2">
+                            <Label for="closing_time" class="text-sm font-medium text-gray-700">Hora Cierre</Label>
+                            <input 
+                                id="closing_time" 
+                                v-model="form.closing_time" 
+                                type="time" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            />
+                            <InputError :message="form.errors.closing_time" />
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="space-y-2">
+                            <Label for="state" class="text-sm font-medium text-gray-700">Estado</Label>
+                            <select 
+                                id="state" 
+                                v-model="form.state" 
+                                required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 focus:outline-none"
+                            >
+                                <option value="" disabled>Seleccione estado</option>
+                                <option value="active">Activo</option>
+                                <option value="inactive">Inactivo</option>
+                            </select>
+                            <InputError :message="form.errors.state" />
+                        </div>
+
+                        <!-- Botones (ocupan las 2 columnas) -->
+                        <div class="col-span-full flex gap-3 pt-4">
+                            <button 
+                                type="submit" 
+                                :disabled="form.processing || deleteForm.processing"
+                                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:scale-105 hover:shadow-blue-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            >
+                                <span v-if="form.processing" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                                {{ isEditing ? 'Actualizar Sucursal' : 'Crear Sucursal' }}
+                            </button>
+                            <button 
+                                v-if="isEditing" 
+                                type="button" 
+                                variant="secondary"
+                                :disabled="form.processing || deleteForm.processing" 
+                                @click="resetForm"
+                                class="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Tabla de Sucursales -->
+                <section class="rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <div class="border-b border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
+                                    <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-900">Listado de Sucursales</h2>
+                                    <p class="text-sm text-gray-500">{{ totalSucursales }} sucursales registradas</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2">
+                                <span class="text-sm font-semibold text-blue-700">{{ totalSucursales }}</span>
+                                <span class="text-sm text-blue-600">sucursales</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Usuario</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Nombre</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Dirección</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Apertura</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Cierre</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Estado</th>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr v-if="branches.length === 0">
+                                    <td colspan="8" class="px-4 py-12 text-center">
+                                        <div class="flex flex-col items-center gap-3">
+                                            <svg class="h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                            </svg>
+                                            <p class="text-gray-500">No hay sucursales registradas</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr 
+                                    v-for="p in branches" 
+                                    :key="p.id" 
+                                    class="transition-colors hover:bg-gray-50"
+                                >
+                                    <td class="px-4 py-3">
+                                        <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">#{{ p.id }}</span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <div class="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100">
+                                                <span class="text-xs font-bold text-blue-700">{{ users.find(u => u.id === p.id_users)?.name?.charAt(0).toUpperCase() || '?' }}</span>
+                                            </div>
+                                            <span class="text-gray-600">{{ users.find(u => u.id === p.id_users)?.name || 'Sin asignar' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 font-medium text-gray-900">{{ p.name }}</td>
+                                    <td class="px-4 py-3 text-gray-600">{{ p.address }}</td>
+                                    <td class="px-4 py-3">
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ p.opening_time }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700">
+                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                            {{ p.closing_time }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span 
+                                            class="inline-flex rounded-full px-2 py-1 text-xs font-medium"
+                                            :class="p.state === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'"
+                                        >
+                                            {{ p.state === 'active' ? 'Activo' : 'Inactivo' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center gap-2">
+                                            <button 
+                                                type="button" 
+                                                @click="startEdit(p)"
+                                                :disabled="form.processing || deleteForm.processing"
+                                                class="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                @click="remove(p)"
+                                                :disabled="form.processing || deleteForm.processing" 
+                                                class="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-100 disabled:opacity-50"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <InputError :message="deleteError" class="mt-3 px-6 pb-4" />
+                </section>
+            </div>
+        </main>
+    </AppLayout>
 </template>

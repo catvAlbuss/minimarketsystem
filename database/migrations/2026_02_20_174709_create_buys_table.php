@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_provider')->references('id')->on('providers')->onDelete('cascade');
             $table->foreignId('id_users')->references('id')->on('users')->onDelete('cascade');
-            $table->string('voucher_number');
-            $table->decimal('total');
+            
+            $table->string('voucher_number')->unique();
+            $table->decimal('total', 10,2);
             $table->enum('payment_method',['cash','card','yape', 'plin']);
-            $table->enum('payment_status',['cancelled','pending','delivered']);
-            $table->timestamp('date_time');
+            $table->enum('payment_status',['cancelled','pending','delivered'])->default('pending');
+            $table->timestamp('date_time')->useCurrent();
             $table->timestamps();
         });
     }
