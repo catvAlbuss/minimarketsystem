@@ -14,11 +14,7 @@ return new class extends Migration
         Schema::create('providers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('id_products')->references('id')->on('products')->onDelete('cascade');
-
             $table->integer('ruc');
-
-            $table->string('ruc');
-
             $table->string('company_name');
             $table->string('contact_person');
             $table->integer('phone');

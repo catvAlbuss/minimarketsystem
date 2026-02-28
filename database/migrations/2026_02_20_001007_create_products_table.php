@@ -24,14 +24,7 @@ return new class extends Migration
             $table->date('expiration_date');
             $table->unsignedTinyInteger('promotion_discount')->default(0);
             $table->enum('state', ['active', 'inactive'])->default('active');
-            $table->foreignId('id_categories')->references('id')->on('categories')->onDelete('cascade');
-            $table->string('code');
-            $table->decimal('unit_price');
-            $table->decimal('higher_price');
-            $table->integer('stock');
-            $table->date('expiration_date');
-            $table->integer('promotion_discount');
-            $table->enum('state', ['active', 'inactive']);
+            
 
             $table->timestamps();
         });

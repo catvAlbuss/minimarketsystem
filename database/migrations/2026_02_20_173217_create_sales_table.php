@@ -21,16 +21,8 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
             $table->enum('payment_method', ['cash', 'card', 'yape', 'plin']);
             $table->enum('voucher', ['ticket', 'invoice']);
-            $table->string('document');
+            $table->string('document')->nullable();
             $table->timestamp('date_time')->useCurrent();
-
-            $table->string('voucher_number');
-            $table->decimal('igv', 10, 2)->default(0.18);
-            $table->decimal('total');
-            $table->enum('payment_method', ['cash', 'card', 'yape', 'plin']);
-            $table->enum('voucher', ['ticket', 'invoice']);
-            $table->string('document');
-            $table->timestamp('date_time');
 
             $table->timestamps();
         });
