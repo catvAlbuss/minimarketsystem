@@ -121,9 +121,8 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
-    // isEditing.value = null;
+    editingId.value=null;
     form.reset();
-    // deleteForm.reset();
     form.clearErrors();
     form.id_sales = props.sales?.[0]?.id ?? '';
     form.id_products = props.products?.[0]?.id ?? '';

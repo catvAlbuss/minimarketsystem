@@ -23,6 +23,7 @@ type Providers = {
 type Products = {
     id: number;
     code: string;
+    description: string;
 };
 
 type Props = {
@@ -175,7 +176,7 @@ const confirmarPedido = (): void => {
 
 const autocompletDescription = (): void => {
     const sel = product.value.find((p) => p.id === form.id_products);
-    form.description_products = sel ? sel.code : '';
+    form.description_products = sel ? sel.description : '';
 };
 
 const categoryLabel = (cat: string) =>

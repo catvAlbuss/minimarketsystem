@@ -31,6 +31,7 @@ import sale_details from '@/routes/sale_details';
 import providers from '@/routes/providers';
 import promotions from '@/routes/promotions';
 import buys from '@/routes/buys';
+import buy_details from '@/routes/buy_details';
 
 
 const mainNavItems: NavItem[] = [
@@ -67,6 +68,11 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Compras',
         href: buys.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Detalle de Compras',
+        href: buy_details.index.url(),
         icon: LayoutGrid,
     },
     {

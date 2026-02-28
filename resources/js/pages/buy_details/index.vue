@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-// import { router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -8,106 +7,110 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import SaleController from '@/actions/App/Http/Controllers/SaleController';
+import BuyDetailsController from '@/actions/App/Http/Controllers/BuyDetailController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Venta',
-        href: './sales',
+        title: 'Detalle de ventas',
+        href: './sale_details',
     },
 ];
- //
+
 // type Category = {
 //     id: number;
 //     name: string;
 //     description: string;
 // }
 
-// type Product = {
+type Product = {
+    id: number;
+    id_categories: number | null;
+    code: string;
+    name: string;
+    description: string;
+    unit_price: number;
+    higher_price: number | null;
+    stock: number;
+    expiration_date: string;
+    promotion_discount: number;
+    state: 'active' | 'inactive';
+};
+
+// type Customer = {
 //     id: number;
-//     id_categories: number | null;
-//     code: string;
+//     dni: string;
 //     name: string;
-//     description: string;
-//     unit_price: number;
-//     higher_price: number | null;
-//     stock: number;
-//     expiration_date: string;
-//     promotion_discount: number;
-//     state: 'active' | 'inactive';
+//     last_name: string;
+//     birthday: string;
+//     email: string;
+//     phone: string;
+//     address: string;
+//     score: number;
+//     state: string;
 // };
 
-type Customer = {
-    id: number;
-    dni: string;
-    name: string;
-    last_name: string;
-    birthday: string;
-    email: string;
-    phone: string;
-    address: string;
-    score: number;
-    state: string;
-};
+// type User = {
+//     id: number,
+//     name: string,
+//     lastname: string,
+//     dni: number,
+//     phone: number,
+//     address: string,
+//     email: string,
+//     children: number,
+//     affiliate: string,
+//     insured: string,
+//     work_modality: string,
+//     entry_date: string,
+//     retention: string,
+//     entry_to_payroll: string,
+//     role: string,
+//     state: string,
+// };
 
-type User = {
+type Buy = {
     id: number,
-    name: string,
-    lastname: string,
-    dni: number,
-    phone: number,
-    address: string,
-    email: string,
-    children: number,
-    affiliate: string,
-    insured: string,
-    work_modality: string,
-    entry_date: string,
-    retention: string,
-    entry_to_payroll: string,
-    role: string,
-    state: string,
-};
-
-type Sale = {
-    id: number,
-    id_customers: number,
+    id_provider: number,
     id_users: number,
     voucher_number: string,
-    igv: number,
     total: number,
     payment_method: 'cash' | 'card' | 'yape' | 'plin',
-    voucher: 'ticket' | 'invoice',
-    document: string,
+    payment_status: 'cancelled'|'pending'|'delivered',
     date_time: string,
 };
 
+type BuyDetails= {
+    id: number,
+    id_buys: number,
+    id_products: number,
+    quantity: number,
+    unit_price: number,
+    sub_total: number,
+}
+
 type Props = {
-    sales: Sale[];
-    // products: Product[];
+    buys: Buy[];
+    products: Product[];
     // categories: Category[];
-    customers: Customer[];
-    users: User[]
+    buy_details: BuyDetails[];
+    // customers: Customer[];
+    // users: User[]
 };
 
 const props = defineProps<Props>();
-const sales = computed(() => props.sales);
-// const products = computed(() => props.products);
+const buys = computed(() => props.buys);
+const products = computed(() => props.products);
 // const categories = computed(() => props.categories);
-const customers = computed(() => props.customers);
+const buy_details = computed(() => props.buy_details);
 
 const editingId = ref<number | null>(null);
 
 const form = useForm({
-    id_customers: props.customers?.[0]?.id ?? '',
-    id_users: props.users?.[0]?.id ?? '',
-    voucher_number: '',
-    igv: 0.18,
-    total: 0,
-    payment_method: '',
-    voucher: '',
-    document: '',
-    date_time: '',
+    id_buys: props.buys?.[0]?.id ?? '',
+    id_products: props.products?.[0]?.id ?? '',
+    quantity: 1,
+    unit_price: 0,
+    sub_total: 0,
 });
 
 const deleteForm = useForm({});
@@ -119,22 +122,22 @@ const resetForm = (): void => {
     editingId.value=null;
     form.reset();
     form.clearErrors();
-    form.id_customers = props.customers?.[0]?.id ?? '';
-    form.id_users = props.users?.[0]?.id ?? '';
+    form.id_buys = props.buys?.[0]?.id ?? '';
+    form.id_products = props.products?.[0]?.id ?? '';
 };
 
-const startEdit = (sales: Sale): void => {
-    editingId.value = sales.id;
+const startEdit = (buy_details: BuyDetails): void => {
+    editingId.value = buy_details.id;
     form.clearErrors();
-    form.id_customers = sales.id_customers ?? props.customers?.[0]?.id ?? '';
-    form.id_users = sales.id_users ?? props.users?.[0]?.id ?? '';
-    form.voucher_number = sales.voucher_number;
-    form.igv = sales.igv;
-    form.total = sales.total;
-    form.payment_method = sales.payment_method;
-    form.voucher = sales.voucher;
-    form.document = sales.document;
-    form.date_time = sales.date_time;
+    form.id_buys = buy_details.id_buys ?? props.buys?.[0]?.id ?? '';
+    form.id_products = buy_details.id_products ?? props.products?.[0]?.id ?? '';
+    form.quantity = buy_details.quantity;
+    form.unit_price = buy_details.unit_price;
+    form.sub_total = buy_details.sub_total;
+    // form.payment_method = sales.payment_method;
+    // form.voucher = sales.voucher;
+    // form.document = sales.document;
+    // form.date_time = sales.date_time;
 };
 
 // const SaleItems = ref<Sale[]>([]); //Array reactivo que almacena los productos agregados
@@ -242,18 +245,18 @@ const submit = (): void => {
         onSuccess: () => resetForm(),
     };
     if (isEditing.value && editingId.value !== null) {
-        form.put(SaleController.update.url(editingId.value), options);
+        form.put(BuyDetailsController.update.url(editingId.value), options);
         return;
     }
-    form.post(SaleController.store.url(), options);
+    form.post(BuyDetailsController.store.url(), options);
 };
 
-const remove = (sales: Sale): void => {
-    if (!confirm(`Eliminar venta "${sales.voucher_number}"?`)) {
+const remove = (buy_details: BuyDetails): void => {
+    if (!confirm(`Eliminar detalle de compra "${buy_details.id}"?`)) {
         return;
     }
 
-    deleteForm.delete(SaleController.destroy.url(sales.id), {
+    deleteForm.delete(BuyDetailsController.destroy.url(buy_details.id), {
         preserveScroll: true,
     });
 };
@@ -295,7 +298,7 @@ const remove = (sales: Sale): void => {
 
 <template class="bg-gray-100" style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;color:#1f2937;">
 
-    <Head title="Products" />
+    <Head title="sale_details" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
 
@@ -307,7 +310,7 @@ const remove = (sales: Sale): void => {
                 <div class="flex items-center gap-5">
                     <button class="btn-menu-tw bg-transparent border-none cursor-pointer text-gray-700" id="menuToggle"
                         style="font-size:1.5em;padding:8px;display:none;"><i class="bi bi-list"></i></button>
-                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Productos</h1>
+                    <h1 class="text-2xl font-semibold text-gray-800">Gestion de Detalle de ventas</h1>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2.5 bg-gray-100 rounded-full" style="padding:8px 15px;">
@@ -328,87 +331,49 @@ const remove = (sales: Sale): void => {
 
                 <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
 
-                    <!-- CAMPO ID_CLIENTE -->
+                    <!-- CAMPO COMPRA -->
                     <div class="grid gap-2">
-                        <Label for="id_customers">Cliente</Label>
-                        <select id="id_customers" v-model="form.id_customers" required
+                        <Label for="id_buys">Compras</Label>
+                        <select id="id_buys" v-model="form.id_buys" required
                             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <option value="" class="text-sm">Seleccione</option>
-                            <option v-for="c in customers" :key="c.id" :value="c.id">
-                                {{ c.name }}
+                            <option value="" class="text-sm" disabled>Seleccione</option>
+                            <option v-for="s in buys" :key="s.id" :value="s.id">
+                                {{ s.voucher_number }}
                             </option>
                         </select>
-                        <InputError :message="form.errors.id_customers" />
+                        <InputError :message="form.errors.id_buys" />
                     </div>
-                    <!-- CAMPO ID_USUARIO -->
+                    <!-- CAMPO PRODUCTO -->
                     <div class="grid gap-2">
-                        <Label for="id_users">Usuario</Label>
-                        <select id="id_users" v-model="form.id_users" required
+                        <Label for="id_products">Producto</Label>
+                        <select id="id_products" v-model="form.id_products" required
                             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
                             <option value="" disabled>Seleccione</option>
-                            <option v-for="u in users" :key="u.id" :value="u.id">
-                                {{ u.name }}
+                            <option v-for="p in products" :key="p.id" :value="p.id">
+                                {{ p.name }}
                             </option>
                         </select>
-                        <InputError :message="form.errors.id_users" />
+                        <InputError :message="form.errors.id_products" />
                     </div>
-                    <!-- CAMPO NÚMERO DE COMPROBANTE -->
+                    <!-- CAMPO CANTIDAD -->
                     <div class="grid gap-2">
-                        <Label for="voucher_number">Número de comprobante </Label>
-                        <Input id="voucher_number" v-model="form.voucher_number" type="text" placeholder="Ej: ajd12312asd" required />
-                        <InputError :message="form.errors.voucher_number" />
+                        <Label for="quantity">Cantidad</Label>
+                        <Input id="quantity" v-model="form.quantity" type="text" placeholder="Ej: ajd12312asd" required />
+                        <InputError :message="form.errors.quantity" />
                     </div>
-                    <!-- CAMPO IGV -->
+                    <!-- CAMPO PRECIO UNITARIO -->
                     <div class="grid gap-2">
-                        <Label for="igv">IGV</Label>
-                        <Input id="igv" v-model="form.igv" type="text" placeholder="Ej: Yogurt" required/>
-                        <InputError :message="form.errors.igv" />
+                        <Label for="unit_price">Precio unitario</Label>
+                        <Input id="unit_price" v-model="form.unit_price" type="text" placeholder="Ej: Yogurt" required/>
+                        <InputError :message="form.errors.unit_price" />
                     </div>
-                    <!-- CAMPO TOTAL -->
+                    <!-- CAMPO SUBTOTAL -->
                     <div class="grid gap-2">
-                        <Label for="total">Total</Label>
-                        <Input id="total" v-model="form.total" type="text" placeholder="Ej: Descripción"
+                        <Label for="sub_total">SubTotal</Label>
+                        <Input id="sub_total" v-model="form.sub_total" type="text" placeholder="Ej: Descripción"
                             required />
-                        <InputError :message="form.errors.total" />
+                        <InputError :message="form.errors.sub_total" />
                     </div>
-                    <!-- CAMPO METODO DE PAGO -->
-                    <div class="grid gap-2">
-                        <Label for="payment_method">Método de pago</Label>
-                        <select id="payment_method" v-model="form.payment_method" required placeholder="Ej: Seleccione"
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <option value="" disabled selected>Seleccione</option>
-                            <option value="cash">Efectivo</option>
-                            <option value="card">Tarjeta</option>
-                            <option value="yape">Yape</option>
-                            <option value="plin">Plin</option>
-                        </select>
-                        <InputError :message="form.errors.payment_method" />
-                    </div>
-                    <!-- CAMPO COMPROBANTE -->
-                    <div class="grid gap-2">
-                        <Label for="voucher">Comprobante</Label>
-                        <select id="voucher" v-model="form.voucher" required
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <option value="" disabled>Seleccione</option>
-                            <option value="ticket">Boleta</option>
-                            <option value="invoice">Factura</option>
-                        </select>
-                    </div>
-                    <!-- CAMPO IMG -->
-                    <div class="grid gap-2">
-                        <Label for="document">IMG</Label>
-                        <Input id="document" v-model="form.document" type="file" placeholder=""
-                             />
-                        <InputError :message="form.errors.document" />
-                    </div>
-                    <!-- CAMPO FECHA -->
-                    <!-- <div class="grid gap-2">
-                        <Label for="date_time">Fecha</Label>
-                        <Input class="[color-scheme:dark]" id="date_time" v-model="form.date_time" type="date" placeholder="Ej: Descripción"
-                            />
-                        <InputError :message="form.errors.date_time" />
-                    </div> -->
-
                     <div class="col-span-full flex gap-2">
                         <Button type="submit" :disabled="form.processing || deleteForm.processing">
                             {{ isEditing ? 'Actualizar' : 'Crear' }}
@@ -424,41 +389,33 @@ const remove = (sales: Sale): void => {
 
             <!-- MOSTRAR CLIENTES -->
             <section class="border border-sidebar-border/70 bg-background p-4">
-                <h2 class="text-lg font-semibold">Listado de Ventas</h2>
+                <h2 class="text-lg font-semibold">Listado de Detalle de ventas</h2>
 
                 <div class="mt-4 overflow-x-auto">
                     <table class="w-full min-w-[720px] text-sm">
                         <thead class="border-b text-left">
                             <tr>
                                 <th class="px-2 py-2">ID</th>
-                                <th class="px-2 py-2">ID Cliente</th>
-                                <th class="px-2 py-2">ID Usuario</th>
-                                <th class="px-2 py-2">Comprobante de pago</th>
-                                <th class="px-2 py-2">IGV</th>
-                                <th class="px-2 py-2">Total</th>
-                                <th class="px-2 py-2">Método de pago</th>
-                                <th class="px-2 py-2">Comprobante</th>
-                                <th class="px-2 py-2">Img</th>
-                                <th class="px-2 py-2">Fecha</th>
+                                <th class="px-2 py-2">ID Compra</th>
+                                <th class="px-2 py-2">ID Producto</th>
+                                <th class="px-2 py-2">Cantidad</th>
+                                <th class="px-2 py-2">Precio unitario</th>
+                                <th class="px-2 py-2">SubTotal</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-if="sales.length === 0">
+                            <tr v-if="buy_details.length === 0">
                                 <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
                                     No hay productos registrados.
                                 </td>
                             </tr>
-                            <tr v-for="s in sales" :key="s.id" class="border-b">
-                                <td class="px-2 py-2">{{ s.id }}</td>
-                                <td class="px-2 py-2">{{ s.id_customers }}</td>
-                                <td class="px-2 py-2">{{ s.id_users }}</td>
-                                <td class="px-2 py-2">{{ s.voucher_number }}</td>
-                                <td class="px-2 py-2">{{ s.igv }}</td>
-                                <td class="px-2 py-2">{{ s.total }}</td>
-                                <td class="px-2 py-2">{{ s.payment_method }}</td>
-                                <td class="px-2 py-2">{{ s.voucher }}</td>
-                                <td class="px-2 py-2">{{ s.document }}</td>
-                                <td class="px-2 py-2">{{ s.date_time }}</td>
+                            <tr v-for="b in buy_details" :key="b.id" class="border-b">
+                                <td class="px-2 py-2">{{ b.id }}</td>
+                                <td class="px-2 py-2">{{ b.id_buys }}</td>
+                                <td class="px-2 py-2">{{ b.id_products }}</td>
+                                <td class="px-2 py-2">{{ b.quantity }}</td>
+                                <td class="px-2 py-2">{{ b.unit_price }}</td>
+                                <td class="px-2 py-2">{{ b.sub_total }}</td>
                                 <td class="px-2 py-2">
                                     <!-- <div class="flex gap-2">
                                         <Button type="button" variant="secondary" size="sm"
@@ -483,4 +440,3 @@ const remove = (sales: Sale): void => {
     </AppLayout>
 
 </template>
-
