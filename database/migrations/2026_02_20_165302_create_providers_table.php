@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_products')->references('id')->on('products')->onDelete('cascade');
 
-            $table->integer('ruc');
+            
 
             $table->string('ruc');
 

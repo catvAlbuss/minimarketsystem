@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { router } from '@inertiajs/vue3';
+// import { router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -17,25 +17,25 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
  //
-type Category = {
-    id: number;
-    name: string;
-    description: string;
-}
+// type Category = {
+//     id: number;
+//     name: string;
+//     description: string;
+// }
 
-type Product = {
-    id: number;
-    id_categories: number | null;
-    code: string;
-    name: string;
-    description: string;
-    unit_price: number;
-    higher_price: number | null;
-    stock: number;
-    expiration_date: string;
-    promotion_discount: number;
-    state: 'active' | 'inactive';
-};
+// type Product = {
+//     id: number;
+//     id_categories: number | null;
+//     code: string;
+//     name: string;
+//     description: string;
+//     unit_price: number;
+//     higher_price: number | null;
+//     stock: number;
+//     expiration_date: string;
+//     promotion_discount: number;
+//     state: 'active' | 'inactive';
+// };
 
 type Customer = {
     id: number;
@@ -84,16 +84,16 @@ type Sale = {
 
 type Props = {
     sales: Sale[];
-    products: Product[];
-    categories: Category[];
+    // products: Product[];
+    // categories: Category[];
     customers: Customer[];
     users: User[]
 };
 
 const props = defineProps<Props>();
 const sales = computed(() => props.sales);
-const products = computed(() => props.products);
-const categories = computed(() => props.categories);
+// const products = computed(() => props.products);
+// const categories = computed(() => props.categories);
 const customers = computed(() => props.customers);
 
 const editingId = ref<number | null>(null);
@@ -138,11 +138,11 @@ const startEdit = (sales: Sale): void => {
     form.date_time = sales.date_time;
 };
 
-const SaleItems = ref<Sale[]>([]); //Array reactivo que almacena los productos agregados
+// const SaleItems = ref<Sale[]>([]); //Array reactivo que almacena los productos agregados
 
-const searchQuery = ref<string>('');
-const paymentMethod = ref<string>('cash');
-const state = ref<string>('paid');
+// const searchQuery = ref<string>('');
+// const paymentMethod = ref<string>('cash');
+// const state = ref<string>('paid');
 
     //ERROR
 //Agrega a las ventas los productos seleccionados
@@ -180,60 +180,60 @@ const state = ref<string>('paid');
 // };
 
 //Actualiza la cantidad de los productos agregados a la ventana de venta
-const updateQuantity = (index: number, newQuantity: number | string) => {
-    let quantity = typeof newQuantity === 'string' ? parseInt(newQuantity) : newQuantity; //convierte a numero para asegurar la validez
+// const updateQuantity = (index: number, newQuantity: number | string) => {
+//     let quantity = typeof newQuantity === 'string' ? parseInt(newQuantity) : newQuantity; //convierte a numero para asegurar la validez
 
-    // Si no es un número válido, establecer a 1
-    if (isNaN(quantity) || quantity < 1) {
-        quantity = 1;
-    }
+//     // Si no es un número válido, establecer a 1
+//     if (isNaN(quantity) || quantity < 1) {
+//         quantity = 1;
+//     }
 
-    const item = SaleItems.value[index];
-    const product = products.value.find(p => p.id === item.id);
+//     const item = SaleItems.value[index];
+//     const product = products.value.find(p => p.id === item.id);
 
-}
+// }
 
 //Elimina un producto de la ventana de ventas
-const removeItemSale = (index: number) => {
-    SaleItems.value.splice(index, 1);
-}
+// const removeItemSale = (index: number) => {
+//     SaleItems.value.splice(index, 1);
+// }
 
 //estado
-const currentPage = ref(1);
-const itemsPage = 8;
+// const currentPage = ref(1);
+// const itemsPage = 8;
 
 //Productos de la paginacian actual
-const paginatedProducts = computed(() => {
-    const start = (currentPage.value - 1) * itemsPage;
-    const end = start + itemsPage;
-    return products.value.slice(start, end);
-});
+// const paginatedProducts = computed(() => {
+//     const start = (currentPage.value - 1) * itemsPage;
+//     const end = start + itemsPage;
+//     return products.value.slice(start, end);
+// });
 
 //total de paginas
-const totalPages = computed(() => {
-    return Math.ceil(products.value.length / itemsPage);
-});
+// const totalPages = computed(() => {
+//     return Math.ceil(products.value.length / itemsPage);
+// });
 
 //funcion para camibar de pagina
-const changePage = (page: number) => {
-    if (page >= 1 && page <= totalPages.value) {
-        currentPage.value = page;
-    }
-};
+// const changePage = (page: number) => {
+//     if (page >= 1 && page <= totalPages.value) {
+//         currentPage.value = page;
+//     }
+// };
 
 //
 
-const subTotal = computed(() => {
-    return SaleItems.value.reduce((suma, item) => suma + item.total, 0);
-});
+// const subTotal = computed(() => {
+//     return SaleItems.value.reduce((suma, item) => suma + item.total, 0);
+// });
 
-const iva = computed(() => {
-    return (Number(subTotal.value) * 0.18).toFixed(2);
-});
+// const iva = computed(() => {
+//     return (Number(subTotal.value) * 0.18).toFixed(2);
+// });
 
-const total = computed(() => {
-    return Number(subTotal.value) + Number(iva.value);
-});
+// const total = computed(() => {
+//     return Number(subTotal.value) + Number(iva.value);
+// });
 
 const submit = (): void => {
     // const data = JSON.stringify(form);
@@ -362,7 +362,7 @@ const remove = (sales: Sale): void => {
                     <!-- CAMPO IGV -->
                     <div class="grid gap-2">
                         <Label for="igv">IGV</Label>
-                        <Input id="igv" v-model="form.igv" type="text" placeholder="Ej: Yogurt" required />
+                        <Input id="igv" v-model="form.igv" type="text" placeholder="Ej: Yogurt" required/>
                         <InputError :message="form.errors.igv" />
                     </div>
                     <!-- CAMPO TOTAL -->
@@ -388,24 +388,27 @@ const remove = (sales: Sale): void => {
                     <!-- CAMPO COMPROBANTE -->
                     <div class="grid gap-2">
                         <Label for="voucher">Comprobante</Label>
-                        <Input id="voucher" v-model="form.voucher" type="text" placeholder="Ej: 5.50"
-                            required />
-                        <InputError :message="form.errors.voucher" />
+                        <select id="voucher" v-model="form.voucher" required
+                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
+                            <option value="" disabled>Seleccione</option>
+                            <option value="ticket">Boleta</option>
+                            <option value="invoice">Factura</option>
+                        </select>
                     </div>
                     <!-- CAMPO IMG -->
                     <div class="grid gap-2">
                         <Label for="document">IMG</Label>
                         <Input id="document" v-model="form.document" type="file" placeholder=""
-                            required />
+                             />
                         <InputError :message="form.errors.document" />
                     </div>
                     <!-- CAMPO FECHA -->
-                    <div class="grid gap-2">
+                    <!-- <div class="grid gap-2">
                         <Label for="date_time">Fecha</Label>
                         <Input class="[color-scheme:dark]" id="date_time" v-model="form.date_time" type="date" placeholder="Ej: Descripción"
-                            required />
+                            />
                         <InputError :message="form.errors.date_time" />
-                    </div>
+                    </div> -->
 
                     <div class="col-span-full flex gap-2">
                         <Button type="submit" :disabled="form.processing || deleteForm.processing">
@@ -458,7 +461,7 @@ const remove = (sales: Sale): void => {
                                 <td class="px-2 py-2">{{ s.document }}</td>
                                 <td class="px-2 py-2">{{ s.date_time }}</td>
                                 <td class="px-2 py-2">
-                                    <div class="flex gap-2">
+                                    <!-- <div class="flex gap-2">
                                         <Button type="button" variant="secondary" size="sm"
                                             :disabled="form.processing || deleteForm.processing" @click="startEdit(s)">
                                             Editar
@@ -467,7 +470,7 @@ const remove = (sales: Sale): void => {
                                             :disabled="form.processing || deleteForm.processing" @click="remove(s)">
                                             Eliminar
                                         </Button>
-                                    </div>
+                                    </div> -->
                                 </td>
                             </tr>
                         </tbody>
@@ -481,3 +484,4 @@ const remove = (sales: Sale): void => {
     </AppLayout>
 
 </template>
+
