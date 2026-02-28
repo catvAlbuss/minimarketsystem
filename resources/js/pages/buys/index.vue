@@ -8,12 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import SaleController from '@/actions/App/Http/Controllers/SaleController';
+import BuyController from '@/actions/App/Http/Controllers/BuyController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Venta',
-        href: './sales',
+        title: 'Compras',
+        href: './buys',
     },
 ];
  //
@@ -37,17 +37,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 //     state: 'active' | 'inactive';
 // };
 
-type Customer = {
+type Providers = {
     id: number;
-    dni: string;
-    name: string;
-    last_name: string;
-    birthday: string;
-    email: string;
-    phone: string;
+    id_products: number;
+    ruc: string;
+    company_name: string;
+    contact_person: string;
+    phone: number;
     address: string;
-    score: number;
-    state: string;
+    email: string;
+    category: string;
+    description_products: string;
+    status: string;
 };
 
 type User = {
@@ -69,44 +70,41 @@ type User = {
     state: string,
 };
 
-type Sale = {
+type Buy = {
     id: number,
-    id_customers: number,
+    id_provider: number,
     id_users: number,
     voucher_number: string,
-    igv: number,
     total: number,
     payment_method: 'cash' | 'card' | 'yape' | 'plin',
-    voucher: 'ticket' | 'invoice',
-    document: string,
+    payment_status: 'cancelled'|'pending'|'delivered',
     date_time: string,
 };
 
 type Props = {
-    sales: Sale[];
+    buys: Buy[];
     // products: Product[];
     // categories: Category[];
-    customers: Customer[];
+    providers: Providers[];
     users: User[]
 };
 
 const props = defineProps<Props>();
-const sales = computed(() => props.sales);
+const buys = computed(() => props.buys);
+const providers = computed(() => props.providers);
 // const products = computed(() => props.products);
 // const categories = computed(() => props.categories);
-const customers = computed(() => props.customers);
+const users = computed(() => props.users);
 
 const editingId = ref<number | null>(null);
 
 const form = useForm({
-    id_customers: props.customers?.[0]?.id ?? '',
+    id_provider: props.providers?.[0]?.id ?? '',
     id_users: props.users?.[0]?.id ?? '',
     voucher_number: '',
-    igv: 0.18,
     total: 0,
     payment_method: '',
-    voucher: '',
-    document: '',
+    payment_status: '',
     date_time: '',
 });
 
@@ -120,22 +118,20 @@ const resetForm = (): void => {
     form.reset();
     // deleteForm.reset();
     form.clearErrors();
-    form.id_customers = props.customers?.[0]?.id ?? '';
+    form.id_provider = props.providers?.[0]?.id ?? '';
     form.id_users = props.users?.[0]?.id ?? '';
 };
 
-const startEdit = (sales: Sale): void => {
-    editingId.value = sales.id;
+const startEdit = (buys: Buy): void => {
+    editingId.value = buys.id;
     form.clearErrors();
-    form.id_customers = sales.id_customers ?? props.customers?.[0]?.id ?? '';
-    form.id_users = sales.id_users ?? props.users?.[0]?.id ?? '';
-    form.voucher_number = sales.voucher_number;
-    form.igv = sales.igv;
-    form.total = sales.total;
-    form.payment_method = sales.payment_method;
-    form.voucher = sales.voucher;
-    form.document = sales.document;
-    form.date_time = sales.date_time;
+    form.id_provider = buys.id_provider ?? props.providers?.[0]?.id ?? '';
+    form.id_users = buys.id_users ?? props.users?.[0]?.id ?? '';
+    form.voucher_number = buys.voucher_number;
+    form.total = buys.total;
+    form.payment_method = buys.payment_method;
+    form.payment_status = buys.payment_status;
+    form.date_time = buys.date_time;
 };
 
 // const SaleItems = ref<Sale[]>([]); //Array reactivo que almacena los productos agregados
@@ -243,18 +239,18 @@ const submit = (): void => {
         onSuccess: () => resetForm(),
     };
     if (isEditing.value && editingId.value !== null) {
-        form.put(SaleController.update.url(editingId.value), options);
+        form.put(BuyController.update.url(editingId.value), options);
         return;
     }
-    form.post(SaleController.store.url(), options);
+    form.post(BuyController.store.url(), options);
 };
 
-const remove = (sales: Sale): void => {
-    if (!confirm(`Eliminar venta "${sales.voucher_number}"?`)) {
+const remove = (buys: Buy): void => {
+    if (!confirm(`Eliminar venta "${buys.voucher_number}"?`)) {
         return;
     }
 
-    deleteForm.delete(SaleController.destroy.url(sales.id), {
+    deleteForm.delete(BuyController.destroy.url(buys.id), {
         preserveScroll: true,
     });
 };
@@ -329,17 +325,17 @@ const remove = (sales: Sale): void => {
 
                 <form class="mt-4 grid gap-4 md:grid-cols-2" @submit.prevent="submit">
 
-                    <!-- CAMPO ID_CLIENTE -->
+                    <!-- CAMPO ID_PROVEEDOR -->
                     <div class="grid gap-2">
-                        <Label for="id_customers">Cliente</Label>
-                        <select id="id_customers" v-model="form.id_customers" required
+                        <Label for="id_provider">Cliente</Label>
+                        <select id="id_provider" v-model="form.id_provider" required
                             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
                             <option value="" class="text-sm">Seleccione</option>
-                            <option v-for="c in customers" :key="c.id" :value="c.id">
-                                {{ c.name }}
+                            <option v-for="p in providers" :key="p.id" :value="p.id">
+                                {{ p.company_name }}
                             </option>
                         </select>
-                        <InputError :message="form.errors.id_customers" />
+                        <InputError :message="form.errors.id_provider" />
                     </div>
                     <!-- CAMPO ID_USUARIO -->
                     <div class="grid gap-2">
@@ -358,12 +354,6 @@ const remove = (sales: Sale): void => {
                         <Label for="voucher_number">Número de comprobante </Label>
                         <Input id="voucher_number" v-model="form.voucher_number" type="text" placeholder="Ej: ajd12312asd" required />
                         <InputError :message="form.errors.voucher_number" />
-                    </div>
-                    <!-- CAMPO IGV -->
-                    <div class="grid gap-2">
-                        <Label for="igv">IGV</Label>
-                        <Input id="igv" v-model="form.igv" type="text" placeholder="Ej: Yogurt" required/>
-                        <InputError :message="form.errors.igv" />
                     </div>
                     <!-- CAMPO TOTAL -->
                     <div class="grid gap-2">
@@ -385,22 +375,17 @@ const remove = (sales: Sale): void => {
                         </select>
                         <InputError :message="form.errors.payment_method" />
                     </div>
-                    <!-- CAMPO COMPROBANTE -->
+                    <!-- CAMPO ESTADO DE PAGO -->
                     <div class="grid gap-2">
-                        <Label for="voucher">Comprobante</Label>
-                        <select id="voucher" v-model="form.voucher" required
+                        <Label for="payment_status">Estado de pago</Label>
+                        <select id="payment_status" v-model="form.payment_status" required placeholder="Ej: Seleccione"
                             class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50">
-                            <option value="" disabled>Seleccione</option>
-                            <option value="ticket">Boleta</option>
-                            <option value="invoice">Factura</option>
+                            <option value="" disabled selected>Seleccione</option>
+                            <option value="cancelled">Cancelado</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="delivered">Entregado</option>
                         </select>
-                    </div>
-                    <!-- CAMPO IMG -->
-                    <div class="grid gap-2">
-                        <Label for="document">IMG</Label>
-                        <Input id="document" v-model="form.document" type="file" placeholder=""
-                             />
-                        <InputError :message="form.errors.document" />
+                        <InputError :message="form.errors.payment_status" />
                     </div>
                     <!-- CAMPO FECHA -->
                     <!-- <div class="grid gap-2">
@@ -409,7 +394,6 @@ const remove = (sales: Sale): void => {
                             />
                         <InputError :message="form.errors.date_time" />
                     </div> -->
-
                     <div class="col-span-full flex gap-2">
                         <Button type="submit" :disabled="form.processing || deleteForm.processing">
                             {{ isEditing ? 'Actualizar' : 'Crear' }}
@@ -432,34 +416,30 @@ const remove = (sales: Sale): void => {
                         <thead class="border-b text-left">
                             <tr>
                                 <th class="px-2 py-2">ID</th>
-                                <th class="px-2 py-2">ID Cliente</th>
+                                <th class="px-2 py-2">ID Proveedor</th>
                                 <th class="px-2 py-2">ID Usuario</th>
                                 <th class="px-2 py-2">Comprobante de pago</th>
-                                <th class="px-2 py-2">IGV</th>
                                 <th class="px-2 py-2">Total</th>
                                 <th class="px-2 py-2">Método de pago</th>
-                                <th class="px-2 py-2">Comprobante</th>
-                                <th class="px-2 py-2">Img</th>
+                                <th class="px-2 py-2">Estado de pago</th>
                                 <th class="px-2 py-2">Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-if="sales.length === 0">
+                            <tr v-if="buys.length === 0">
                                 <td colspan="6" class="px-2 py-4 text-center text-muted-foreground">
                                     No hay productos registrados.
                                 </td>
                             </tr>
-                            <tr v-for="s in sales" :key="s.id" class="border-b">
-                                <td class="px-2 py-2">{{ s.id }}</td>
-                                <td class="px-2 py-2">{{ s.id_customers }}</td>
-                                <td class="px-2 py-2">{{ s.id_users }}</td>
-                                <td class="px-2 py-2">{{ s.voucher_number }}</td>
-                                <td class="px-2 py-2">{{ s.igv }}</td>
-                                <td class="px-2 py-2">{{ s.total }}</td>
-                                <td class="px-2 py-2">{{ s.payment_method }}</td>
-                                <td class="px-2 py-2">{{ s.voucher }}</td>
-                                <td class="px-2 py-2">{{ s.document }}</td>
-                                <td class="px-2 py-2">{{ s.date_time }}</td>
+                            <tr v-for="b in buys" :key="b.id" class="border-b">
+                                <td class="px-2 py-2">{{ b.id }}</td>
+                                <td class="px-2 py-2">{{ b.id_provider }}</td>
+                                <td class="px-2 py-2">{{ b.id_users }}</td>
+                                <td class="px-2 py-2">{{ b.voucher_number }}</td>
+                                <td class="px-2 py-2">{{ b.total }}</td>
+                                <td class="px-2 py-2">{{ b.payment_method }}</td>
+                                <td class="px-2 py-2">{{ b.payment_status }}</td>
+                                <td class="px-2 py-2">{{ b.date_time }}</td>
                                 <td class="px-2 py-2">
                                     <!-- <div class="flex gap-2">
                                         <Button type="button" variant="secondary" size="sm"

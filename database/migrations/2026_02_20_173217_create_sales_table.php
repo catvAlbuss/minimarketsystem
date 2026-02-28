@@ -21,10 +21,8 @@ return new class extends Migration
             $table->decimal('total', 10, 2);
             $table->enum('payment_method', ['cash', 'card', 'yape', 'plin']);
             $table->enum('voucher', ['ticket', 'invoice']);
-            $table->string('document');
+            $table->string('document')->nullable();
             $table->timestamp('date_time')->useCurrent();
-
-           
             $table->timestamps();
         });
     }

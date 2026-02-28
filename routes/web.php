@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\BuyController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CustomerController;
@@ -8,6 +9,7 @@ use App\Models\Branch;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\ProviderController;
+use App\Http\Controllers\SaleDetailController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -32,9 +34,11 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::resource('products', ProductsController::class);
     Route::resource('customers', CustomerController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('sales',SaleController::class);
+    Route::resource('sales', SaleController::class);
+    Route::resource('sale_details', SaleDetailController::class);
+    Route::resource('buys', BuyController::class);
     // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
-    Route::resource('providers',ProviderController::class);
+    Route::resource('providers', ProviderController::class);
     Route::resource('promotions', PromotionController::class);    // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
     Route::resource('branches', BranchController::class)->only(['index', 'store', 'update', 'destroy']);
     // Route::post('/reservations', [ReservationController::class, 'create'])->name('reservations.create');
@@ -46,4 +50,4 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
 
 
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';

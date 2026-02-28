@@ -27,8 +27,11 @@ import users from '@/routes/users';
 import customers from '@/routes/customers';
 import categories from '@/routes/categories';
 import sales from '@/routes/sales';
+import sale_details from '@/routes/sale_details';
 import providers from '@/routes/providers';
 import promotions from '@/routes/promotions';
+import buys from '@/routes/buys';
+
 
 const mainNavItems: NavItem[] = [
     {
@@ -54,6 +57,16 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Ventas',
         href: sales.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Detalle de Ventas',
+        href: sale_details.index.url(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Compras',
+        href: buys.index.url(),
         icon: LayoutGrid,
     },
     {
