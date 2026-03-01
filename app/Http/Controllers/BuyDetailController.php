@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\BuyDetail;
 use App\Http\Controllers\Controller;
+use App\Models\Buy;
+use App\Models\Products;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BuyDetailController extends Controller
 {
@@ -13,7 +16,15 @@ class BuyDetailController extends Controller
      */
     public function index()
     {
-        //
+        $buy_details = BuyDetail::all();
+        $buys = Buy::all();
+        $products = Products::all();
+        return Inertia::render('buy_details/index', [
+            'buy_details' => $buy_details,
+            'buys' => $buys,
+            'products' => $products,
+            // 'users' => $users,
+        ]);
     }
 
     /**
@@ -29,7 +40,23 @@ class BuyDetailController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validateData = $request->validate([
+            'id_buys' => 'required|exists:buys,id',
+            'id_products' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'unit_price' => 'required|numeric|min:0',
+            'sub_total' => 'required|numeric|min:0',
+        ]);
+
+        BuyDetail::create([
+            'id_buys' => $validateData['id_buys'],
+            'id_products' => $validateData['id_products'],
+            'quantity' => $validateData['quantity'],
+            'unit_price' => $validateData['unit_price'],
+            'sub_total' => $validateData['sub_total'],
+        ]);
+
+        return to_route('buy_details.index');
     }
 
     /**

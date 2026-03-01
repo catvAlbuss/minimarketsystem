@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Promotion;
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+use App\Models\Products;
+// use Illuminate\Http\Request;
+use Inertia\Inertia;
+
 
 class PromotionController extends Controller
 {
@@ -14,6 +19,14 @@ class PromotionController extends Controller
     public function index()
     {
         //
+
+
+        $promotions = Promotion::all();
+        $products = Products::select('id', 'name', 'unit_price', 'promotion_discount')->get();
+        return Inertia::render('promotions/index', [
+            'promotions' => $promotions,
+            'products' => $products,
+        ]);
     }
 
     /**
@@ -29,7 +42,23 @@ class PromotionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'item' => ['required','array'],
+            'name_promotion' => ['required','string'],
+            'price' => ['required','numeric'],
+            'state' => ['required','in:active,inactive']       
+        ]);
+
+        foreach ($request->item as $item) {
+            Promotion::create([
+                'id_products' => $item['id'],
+                'name_promotion' => $validate['name_promotion'],
+                'price' => $validate['price'],
+                'state' => $validate['state']
+            ]);
+        };
+
+        return to_route('promotions.index');
     }
 
     /**
@@ -51,16 +80,43 @@ class PromotionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Promotion $promotion)
+    public function update(Request $request, $id_promotion)
     {
         //
+        $promotion = Promotion::findOrFail($id_promotion);
+        $oldName = $promotion->getOriginal('name_promotion');
+
+        $validate = $request->validate([
+            'item' => ['required','array'],
+            'name_promotion' => ['required','string'],
+            'price' => ['required','numeric'],
+            'state' => ['required','in:active,inactive']       
+        ]);
+
+        Promotion::where('name_promotion',$oldName)->delete();
+
+        foreach ($validate['item'] as $prod) {
+            Promotion::create([
+                'id_products' => $prod['id'],
+                'name_promotion'=> $validate['name_promotion'],
+                'price' => $validate['price'],
+                'state' => $validate['state']
+            ]);
+        }
+
+        return to_route('promotions.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Promotion $promotion)
+    public function destroy(string $id_promotion)
     {
-        //
+        $promotion = Promotion::findOrFail($id_promotion);
+        $nameDelete = $promotion->name_promotion;
+
+        Promotion::where('name_promotion', $nameDelete)->delete();
+
+        return to_route('promotions.index');
     }
 }

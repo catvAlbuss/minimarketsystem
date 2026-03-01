@@ -13,14 +13,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_categories')->references('id')->on('categories')->onDelete('cascade');
-            $table->string('code');
-            $table->decimal('unit_price');
-            $table->decimal('higher_price');
-            $table->integer('stock');
+
+            $table->foreignId('id_categories')->constrained('categories')->cascadeOnDelete();
+            $table->string('code')->unique();
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->decimal('unit_price', 10, 2);
+            $table->decimal('higher_price', 10, 2);
+            $table->integer('stock')->default(0);
             $table->date('expiration_date');
-            $table->integer('promotion_discount');
-            $table->enum('state',['active', 'inactive']);
+            $table->unsignedTinyInteger('promotion_discount')->default(0);
+            $table->enum('state', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }

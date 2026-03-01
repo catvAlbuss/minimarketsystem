@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_sales')->references('id')->on('sales')->onDelete('cascade');
             $table->foreignId('id_products')->references('id')->on('products')->onDelete('cascade');
-            $table->integer('quantity');
-            $table->decimal('discount');
-            $table->decimal('sub_total');
+            $table->unsignedInteger('quantity');
+            $table->decimal('discount', 10,2)->default(0);
+            $table->decimal('sub_total', 10,2);
             $table->timestamps();
         });
     }
@@ -30,3 +30,6 @@ return new class extends Migration
         Schema::dropIfExists('sale_details');
     }
 };
+
+
+

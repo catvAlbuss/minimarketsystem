@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\SaleDetail;
 use App\Http\Controllers\Controller;
+use App\Models\Products;
+use App\Models\Sale;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class SaleDetailController extends Controller
 {
@@ -13,7 +16,15 @@ class SaleDetailController extends Controller
      */
     public function index()
     {
-        //
+        $sale_details = SaleDetail::all();
+        $sales = Sale::all();
+        $products = Products::all();
+        return Inertia::render('sale_details/index', [
+            'sale_details' => $sale_details,
+            'sales' => $sales,
+            'products' => $products,
+            // 'users' => $users,
+        ]);
     }
 
     /**
@@ -29,7 +40,22 @@ class SaleDetailController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validateData = $request->validate([
+            'id_sales' => 'required|exists:sales,id',
+            'id_products' => 'required|exists:products,id',
+            'quantity' => 'required|integer|min:1',
+            'discount' => 'required|numeric|min:0',
+            'sub_total' => 'required|numeric|min:0',
+        ]);
+
+        SaleDetail::create([
+            'id_sales' => $validateData['id_sales'],
+            'id_products' => $validateData['id_products'],
+            'quantity' => $validateData['quantity'],
+            'discount' => $validateData['discount'],
+            'sub_total' => $validateData['sub_total'],
+        ]);
+        return to_route('sale_details.index');
     }
 
     /**
