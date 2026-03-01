@@ -1,5 +1,4 @@
 <script setup lang="ts">
- 
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ import { computed, ref } from 'vue';
 import ProductsController from '@/actions/App/Http/Controllers/ProductsController';
 import InputError from '@/components/InputError.vue';
 import { index as productsIndex } from '@/routes/products';
-
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -61,7 +59,6 @@ const form = useForm({
     promotion_discount: 0,
     state: 'active',
 });
-
 
 const deleteForm = useForm({});
 const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
@@ -176,7 +173,7 @@ const remove = (products: Products): void => {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Valor Inventario</p>
-                            <h3 class="mt-1 text-3xl font-bold text-green-600">S/ {{ products.reduce((sum, p) => sum + (p.unit_price * p.stock), 0).toFixed(2) }}</h3>
+                            <h3 class="mt-1 text-3xl font-bold text-green-600">S/ {{ products.reduce((sum, p) => sum + (Number(p.unit_price) * p.stock), 0).toFixed(2) }}</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-green-50">
                             <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,9 +196,6 @@ const remove = (products: Products): void => {
                         <h2 class="text-lg font-bold text-gray-900">
                             {{ isEditing ? ' Editar producto' : ' Nuevo producto' }}
                         </h2>
-                        <p class="text-sm text-gray-500">
-                            {{ isEditing ? 'Modifica los datos del producto' : 'Registra un nuevo producto al inventario' }}
-                        </p>
                     </div>
                 </div>
 
@@ -281,7 +275,7 @@ const remove = (products: Products): void => {
 
                     <!-- Precio Mayor -->
                     <div class="space-y-2">
-                        <Label for="higher_price" class="text-sm font-medium text-gray-700">Precio al Mayor </Label>
+                        <Label for="higher_price" class="text-sm font-medium text-gray-700">Precio al Mayor</Label>
                         <Input 
                             id="higher_price" 
                             v-model="form.higher_price" 
@@ -321,7 +315,7 @@ const remove = (products: Products): void => {
 
                     <!-- Descuento -->
                     <div class="space-y-2">
-                        <Label for="promotion_discount" class="text-sm font-medium text-gray-700">Descuento % </Label>
+                        <Label for="promotion_discount" class="text-sm font-medium text-gray-700">Descuento %</Label>
                         <Input 
                             id="promotion_discount" 
                             v-model="form.promotion_discount" 
@@ -417,6 +411,12 @@ const remove = (products: Products): void => {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                         </svg>
                                         <p class="text-gray-500">No hay productos registrados</p>
+                                        <button 
+                                            @click="editingId = null"
+                                            class="mt-2 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                                        >
+                                            + Agregar primer producto
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

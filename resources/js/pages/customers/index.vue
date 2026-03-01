@@ -187,9 +187,6 @@ const remove = (customer: Customer): void => {
                         <h2 class="text-lg font-bold text-gray-900">
                             {{ isEditing ? ' Editar cliente' : ' Nuevo cliente' }}
                         </h2>
-                        <p class="text-sm text-gray-500">
-                            {{ isEditing ? 'Modificar datos del cliente' : 'Registra un nuevo cliente' }}
-                        </p>
                     </div>
                 </div>
 
