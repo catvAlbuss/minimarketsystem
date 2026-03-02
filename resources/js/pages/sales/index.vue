@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import SaleController from '@/actions/App/Http/Controllers/SaleController';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import SaleController from '@/actions/App/Http/Controllers/SaleController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -425,13 +422,14 @@ const procesSale = async () => {
                                                         'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30'
                                                     ]">
                                             Eliminar
-                                        </Button>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <InputError :message="deleteError" class="mt-3 px-6 pb-4" />
             </section>
 
             <!-- Tabla de Ventas -->

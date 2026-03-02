@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import CartSidebar from '@/components/storefront/CartSidebar.vue';
 import CategoriesFilter from '@/components/storefront/CategoriesFilter.vue';
@@ -6,7 +7,6 @@ import ProductsGrid from '@/components/storefront/ProductsGrid.vue';
 import PromotionsGrid from '@/components/storefront/PromotionsGrid.vue';
 import { useStorefront } from '@/composables/useStorefront';
 import { dashboard, login, register } from '@/routes';
-import { Head, Link } from '@inertiajs/vue3';
 
 // ── Props ──────────────────────────────────────────────────────────────────
 const props = withDefaults(defineProps<{ canRegister: boolean }>(), { canRegister: true });

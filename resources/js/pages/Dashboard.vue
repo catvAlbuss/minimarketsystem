@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { dashboard } from '@/routes';
-import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { Head } from '@inertiajs/vue3';
+import { computed } from 'vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { dashboard } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 type Branch = {

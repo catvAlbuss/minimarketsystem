@@ -1,5 +1,5 @@
-import StorefrontController from '@/actions/App/Http/Controllers/StorefrontController';
 import { computed, onMounted, ref, watch } from 'vue';
+import StorefrontController from '@/actions/App/Http/Controllers/StorefrontController';
 
 // ────────────────── Types ──────────────────
 export type Branch = {

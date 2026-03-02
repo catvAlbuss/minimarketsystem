@@ -5,27 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
-import { type NavItem } from '@/types';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editProfile } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
+import { type NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Perfil',
         href: editProfile(),
     },
     {
-        title: 'Password',
+        title: 'Contraseña',
         href: editPassword(),
     },
     {
-        title: 'Two-Factor Auth',
+        title: 'Autenticación en dos pasos',
         href: show(),
     },
     {
-        title: 'Appearance',
+        title: 'Apariencia',
         href: editAppearance(),
     },
 ];
@@ -34,30 +34,31 @@ const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
-    <div class="px-4 py-6">
+    <div class="rounded-2xl border border-blue-100 bg-white/90 px-4 py-6 shadow-sm dark:border-slate-800 dark:bg-slate-950/80">
         <Heading
-            title="Settings"
-            description="Manage your profile and account settings"
+            title="Configuración"
+            description="Administra tu perfil y la configuración de tu cuenta"
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Settings"
+                    aria-label="Configuración"
                 >
                     <Button
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"
                         variant="ghost"
                         :class="[
-                            'w-full justify-start',
-                            { 'bg-muted': isCurrentUrl(item.href) },
+                            'w-full justify-start rounded-xl border px-3 text-left transition-colors',
+                            isCurrentUrl(item.href)
+                                ? 'border-blue-200 bg-blue-50 font-semibold text-blue-700 dark:border-sky-500/40 dark:bg-slate-900 dark:text-sky-300'
+                                : 'border-transparent text-slate-600 hover:border-blue-100 hover:bg-sky-50 hover:text-blue-700 dark:text-slate-300 dark:hover:border-slate-700 dark:hover:bg-slate-900 dark:hover:text-sky-300',
                         ]"
                         as-child
                     >
                         <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
                             {{ item.title }}
                         </Link>
                     </Button>
