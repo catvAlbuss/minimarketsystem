@@ -9,7 +9,7 @@ trait HasBranchScope
 {
     /**
      * Get the branch ID the authenticated user is scoped to.
-     * Returns null for global roles (root, gerencia, administracion_general).
+     * Returns null for global roles (root, managment, administrator_general).
      */
     protected function currentBranchId(): ?int
     {

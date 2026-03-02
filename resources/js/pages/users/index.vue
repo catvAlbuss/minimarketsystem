@@ -158,6 +158,7 @@ const roleLabel = (role: string) =>
         logistic: 'Logística',
         cashier: 'Cajero',
         asistente: 'Asistente',
+        cliente: 'Cliente',
     })[role] ?? role;
 
 const roleBadgeClass = (role: string) => {
@@ -170,6 +171,7 @@ const roleBadgeClass = (role: string) => {
         logistic: 'bg-teal-100 text-teal-700',
         cashier: 'bg-green-100 text-green-700',
         asistente: 'bg-gray-100 text-gray-600',
+        cliente: 'bg-yellow-100 text-yellow-700',
     };
     return map[role] ?? 'bg-gray-100 text-gray-600';
 };
@@ -775,6 +777,7 @@ const disabledClass =
                                     <option value="logistic">Logística</option>
                                     <option value="cashier">Cajero</option>
                                     <option value="asistente">Asistente</option>
+                                    <option value="cliente">Cliente</option>
                                 </select>
                                 <InputError :message="form.errors.role" />
                             </div>

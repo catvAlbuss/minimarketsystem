@@ -10,18 +10,22 @@ class UsersTableSeeder extends Seeder
 {
     /**
      * Roles that have global access (no branch restriction).
+     *
+     * Those are the same identifiers as in User::GLOBAL_ROLES.
      */
-    private const GLOBAL_ROLES = ['root', 'gerencia', 'administracion_general'];
+    private const GLOBAL_ROLES = ['root', 'managment', 'administrator_general'];
 
     /**
      * Map of seeder role label => [name, email, legacy_role]
      */
     public const USERS = [
         'root'                   => ['name' => 'Root User',      'email' => 'root@example.com'],
-        'gerencia'               => ['name' => 'Gerencia User',  'email' => 'gerencia@example.com'],
-        'administracion_general' => ['name' => 'Admin General',  'email' => 'admingeneral@example.com'],
-        'administracion_zonal'   => ['name' => 'Admin Zonal',    'email' => 'adminzonal@example.com'],
-        'cajero'                 => ['name' => 'Cajero User',    'email' => 'cajero@example.com'],
+        'managment'              => ['name' => 'Gerencia User',  'email' => 'gerencia@example.com'],
+        'administrator_general'  => ['name' => 'Admin General',  'email' => 'admingeneral@example.com'],
+        'logistic_general'       => ['name' => 'Zonal Admin',    'email' => 'adminzonal@example.com'],
+        'administrator'          => ['name' => 'Administrador',  'email' => 'administrador@example.com'],
+        'logistic'               => ['name' => 'Logística User', 'email' => 'logistica@example.com'],
+        'cashier'                => ['name' => 'Cajero User',    'email' => 'cajero@example.com'],
         'asistente'              => ['name' => 'Asistente User', 'email' => 'asistente@example.com'],
         'cliente'                => ['name' => 'Cliente User',   'email' => 'cliente@example.com'],
     ];
@@ -87,14 +91,14 @@ class UsersTableSeeder extends Seeder
                 'entry_date'      => now(),
                 'retention'       => 'no',
                 'entry_to_payroll' => 'no',
-                'role'            => 'cajero',
+                'role'            => 'cashier',
                 'state'           => 'active',
                 'branch_id'       => $firstBranch?->id ?? null,
             ]
         );
 
         if (method_exists($systemCashier, 'syncRoles')) {
-            $systemCashier->syncRoles(['cajero']);
+            $systemCashier->syncRoles(['cashier']);
         }
     }
 }

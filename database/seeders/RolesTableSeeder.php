@@ -13,10 +13,12 @@ class RolesTableSeeder extends Seeder
      */
     public const ROLES = [
         'root',
-        'gerencia',
-        'administracion_general',
-        'administracion_zonal',
-        'cajero',
+        'managment',
+        'administrator_general',
+        'logistic_general',
+        'administrator',
+        'logistic',
+        'cashier',
         'asistente',
         'cliente',
     ];
@@ -40,14 +42,14 @@ class RolesTableSeeder extends Seeder
             $root->syncPermissions($allPermissions);
         }
 
-        // gerencia -> most permissions
-        $gerencia = Role::where('name', 'gerencia')->first();
-        if ($gerencia) {
-            $gerencia->syncPermissions($allPermissions);
+        // managment (formerly "gerencia") -> most permissions
+        $managment = Role::where('name', 'managment')->first();
+        if ($managment) {
+            $managment->syncPermissions($allPermissions);
         }
 
-        // administracion_general -> manage core modules
-        $ag = Role::where('name', 'administracion_general')->first();
+        // administrator_general -> manage core modules
+        $ag = Role::where('name', 'administrator_general')->first();
         if ($ag) {
             $ag->syncPermissions([
                 'view products','create products','edit products','delete products',
@@ -55,18 +57,30 @@ class RolesTableSeeder extends Seeder
             ]);
         }
 
-        // administracion_zonal -> subset
-        $az = Role::where('name', 'administracion_zonal')->first();
-        if ($az) {
-            $az->syncPermissions([
+        // logistic_general (previously "administracion_zonal") -> limited view access
+        $lg = Role::where('name', 'logistic_general')->first();
+        if ($lg) {
+            $lg->syncPermissions([
                 'view products','view sales','view buys','view reports'
             ]);
         }
 
-        // cajero -> sales related
-        $cajero = Role::where('name', 'cajero')->first();
-        if ($cajero) {
-            $cajero->syncPermissions(['view products','create sales','view sales']);
+        // administrator -> no default permissions; customise after seeding if necessary
+        $admin = Role::where('name', 'administrator')->first();
+        if ($admin) {
+            // intentionally left blank
+        }
+
+        // logistic -> placeholder for branch-level logistics staff
+        $log = Role::where('name', 'logistic')->first();
+        if ($log) {
+            // intentionally left blank
+        }
+
+        // cashier (cajero) -> sales related
+        $cashier = Role::where('name', 'cashier')->first();
+        if ($cashier) {
+            $cashier->syncPermissions(['view products','create sales','view sales']);
         }
 
         // asistente -> limited view

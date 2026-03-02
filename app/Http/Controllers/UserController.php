@@ -46,7 +46,7 @@ class UserController extends Controller
             'entry_date' => ['required'],
             'retention' => ['required', 'in:yes,no'],
             'entry_to_payroll' => ['required', 'in:yes,no'],
-            'role' => ['required', 'in:root,gerencia,administracion_general,administracion_zonal,cajero,asistente,cliente'],
+            'role' => ['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente,cliente'],
             'state' => ['required', 'in:active,inactive'],
             'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
@@ -108,7 +108,7 @@ class UserController extends Controller
             'entry_date' => ['required'],
             'retention' => ['required', 'in:yes,no'],
             'entry_to_payroll' => ['required', 'in:yes,no'],
-            'role' => ['required', 'in:root,gerencia,administracion_general,administracion_zonal,cajero,asistente,cliente'],
+            'role' => ['required', 'in:root,managment,administrator_general,logistic_general,administrator,logistic,cashier,asistente,cliente'],
             'state' => ['required', 'in:active,inactive'],
             'branch_id' => ['nullable', 'exists:branches,id'],
         ]);
