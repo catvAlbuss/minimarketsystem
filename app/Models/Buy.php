@@ -24,4 +24,8 @@ class Buy extends Model
     {
         return $this->belongsTo(User::class, 'id_users');
     }
+    public function buyDetails()
+    {
+        return $this->hasMany(\App\Models\BuyDetail::class, 'id_buys');
+    }
 }

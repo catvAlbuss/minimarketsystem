@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles; // IMPORTACIÓN RECUPERADA
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable, \Spatie\Permission\Traits\HasRoles;
+    // SE AGREGA HasRoles DENTRO DEL MODELO PARA ACTIVAR LA FUNCIONALIDAD
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
     // Roles that have global (cross-branch) access
     // these are the *internal* role identifiers (not the human labels)
@@ -82,8 +84,9 @@ class User extends Authenticatable
      */
     public function isGlobalRole(): bool
     {
-        // Check Spatie roles first
-        if ($this->roles->isNotEmpty()) {
+        // 1. Verificación defensiva: Si el trait está cargado y existen roles en la relación
+        // Esto evita el error "Call to a member function isNotEmpty() on null"
+        if ($this->roles && $this->roles->isNotEmpty()) {
             foreach (self::GLOBAL_ROLES as $globalRole) {
                 if ($this->hasRole($globalRole)) {
                     return true;
@@ -92,7 +95,7 @@ class User extends Authenticatable
             return false;
         }
 
-        // Fallback to legacy 'role' column
+        // 2. Fallback a la columna 'role' (Mantiene tu funcionalidad original si no hay roles de Spatie)
         return in_array($this->role, self::GLOBAL_ROLES, true);
     }
 

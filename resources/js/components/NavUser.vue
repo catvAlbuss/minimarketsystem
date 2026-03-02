@@ -27,24 +27,18 @@ const { isMobile, state } = useSidebar();
                 <DropdownMenuTrigger as-child>
                     <SidebarMenuButton
                         size="lg"
-                        class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                        class="rounded-xl border border-blue-100 bg-white px-2 transition-colors duration-200 hover:bg-sky-50 data-[state=open]:bg-blue-50 data-[state=open]:text-blue-700 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800 dark:data-[state=open]:bg-slate-800 dark:data-[state=open]:text-sky-300"
                         data-test="sidebar-menu-button"
                     >
                         <UserInfo :user="user" />
-                        <ChevronsUpDown class="ml-auto size-4" />
+                        <ChevronsUpDown class="ml-auto size-4 text-sky-600 dark:text-sky-400" />
                     </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                    class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                    :side="
-                        isMobile
-                            ? 'bottom'
-                            : state === 'collapsed'
-                              ? 'left'
-                              : 'bottom'
-                    "
+                    class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg border-blue-100 dark:border-slate-700"
+                    :side="isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'"
                     align="end"
-                    :side-offset="4"
+                    :side-offset="6"
                 >
                     <UserMenuContent :user="user" />
                 </DropdownMenuContent>

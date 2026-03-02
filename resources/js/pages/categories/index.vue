@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
 import { computed, ref } from 'vue';
 import CategoryController from '@/actions/App/Http/Controllers/CategoryController';
 import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -109,17 +109,18 @@ const remove = (categories: Category): void => {
             <!-- Header -->
             <div class="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Gestión de Categorías</h1>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Categorías</h1>
                 </div>
             </div>
 
             <!-- KPIs Cards -->
             <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                <!-- Total Categorías -->
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">Total Categorías</p>
-                            <h3 class="mt-1 text-3xl font-bold text-gray-900">{{ categories.length }}</h3>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Categorías</p>
+                            <h3 class="mt-1 text-3xl font-bold text-gray-900 dark:text-white">{{ categories.length }}</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50">
                             <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +131,8 @@ const remove = (categories: Category): void => {
                     </div>
                 </div>
 
-                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                <!-- Productos Asociados -->
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Productos Asociados</p>
@@ -146,7 +148,8 @@ const remove = (categories: Category): void => {
                     </div>
                 </div>
 
-                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                <!-- Con Descripción -->
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-medium text-gray-600">Con Descripción</p>
@@ -162,11 +165,12 @@ const remove = (categories: Category): void => {
                     </div>
                 </div>
 
-                <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:shadow-md">
+                <!-- Última Actualización -->
+                <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm transition-all hover:shadow-md">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-600">Última Actualización</p>
-                            <h3 class="mt-1 text-3xl font-bold text-orange-600">Hoy</h3>
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Última Actualización</p>
+                            <h3 class="mt-1 text-3xl font-bold text-orange-600 dark:text-orange-400">Hoy</h3>
                         </div>
                         <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-50">
                             <svg class="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +183,7 @@ const remove = (categories: Category): void => {
             </div>
 
             <!-- Formulario de Categoría -->
-            <section class="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <section class="mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm">
                 <div class="mb-5 flex items-center gap-3">
                     <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
                         <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,8 +192,8 @@ const remove = (categories: Category): void => {
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-lg font-bold text-gray-900">
-                            {{ isEditing ? ' Editar categoría' : ' Nueva Categoría' }}
+                        <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+                            {{ isEditing ? 'Editar categoría' : 'Nueva Categoría' }}
                         </h2>
                     </div>
                 </div>
@@ -241,14 +245,14 @@ const remove = (categories: Category): void => {
                             :disabled="form.processing || deleteForm.processing" @click="resetForm"
                             :class="['rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 disabled:opacity-50']">
                             Cancelar
-                        </Button>
+                        </button>
                     </div>
                 </form>
             </section>
 
             <!-- Tabla de Categorías -->
-            <section class="rounded-xl border border-gray-200 bg-white shadow-sm">
-                <div class="border-b border-gray-200 p-6">
+            <section class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+                <div class="border-b border-gray-200 dark:border-gray-700 p-6">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50">
@@ -259,20 +263,20 @@ const remove = (categories: Category): void => {
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-gray-900">Listado de Categorías</h2>
-                                <p class="text-sm text-gray-500">{{ categories.length }} categorías registradas</p>
+                                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Listado de Categorías</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ categories.length }} categorías registradas</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2">
-                            <span class="text-sm font-semibold text-blue-700">{{ categories.length }}</span>
-                            <span class="text-sm text-blue-600">categorías</span>
+                        <div class="flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-900/30 px-4 py-2">
+                            <span class="text-sm font-semibold text-blue-700 dark:text-blue-400">{{ categories.length }}</span>
+                            <span class="text-sm text-blue-600 dark:text-blue-400">categorías</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
-                        <thead class="bg-gray-50">
+                        <thead class="bg-gray-50 dark:bg-gray-900/50">
                             <tr>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">ID</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Nombre</th>
@@ -291,7 +295,7 @@ const remove = (categories: Category): void => {
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                         </svg>
-                                        <p class="text-gray-500">No hay categorías registradas</p>
+                                        <p class="text-gray-500 dark:text-gray-400">No hay categorías registradas</p>
                                     </div>
                                 </td>
                             </tr>
@@ -307,10 +311,10 @@ const remove = (categories: Category): void => {
                                             <span class="text-sm font-bold text-blue-700">{{
                                                 category.name.charAt(0).toUpperCase() }}</span>
                                         </div>
-                                        <p class="font-semibold text-gray-900">{{ category.name }}</p>
+                                        <p class="font-semibold text-gray-900 dark:text-white">{{ category.name }}</p>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-gray-600">
+                                <td class="px-4 py-3 text-gray-600 dark:text-gray-400">
                                     <p class="line-clamp-2">{{ category.description }}</p>
                                 </td>
                                 <!-- AGREGAR NOMBRE DE SUCURSAL -->
@@ -330,7 +334,7 @@ const remove = (categories: Category): void => {
                                             @click="remove(category)"
                                             :class="['rounded-lg bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-100 disabled:opacity-50']">
                                             Eliminar
-                                        </Button>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>

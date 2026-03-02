@@ -1,4 +1,9 @@
 import {
+  __commonJS,
+  __export,
+  __toESM
+} from "./chunk-G3PMV62Z.js";
+import {
   Fragment,
   computed,
   createSSRApp,
@@ -16,11 +21,6 @@ import {
   shallowRef,
   watch
 } from "./chunk-ZETSIBQN.js";
-import {
-  __commonJS,
-  __export,
-  __toESM
-} from "./chunk-G3PMV62Z.js";
 
 // node_modules/es-errors/type.js
 var require_type = __commonJS({
@@ -602,7 +602,7 @@ var require_side_channel_list = __commonJS({
       } else {
         objects.next = /** @type {import('./list.d.ts').ListNode<typeof value, typeof key>} */
         {
-          // eslint-disable-line no-param-reassign, no-extra-parens
+           
           key: key2,
           next: objects.next,
           value
@@ -1201,7 +1201,7 @@ var require_get_intrinsic = __commonJS({
       "%encodeURIComponent%": encodeURIComponent,
       "%Error%": $Error,
       "%eval%": eval,
-      // eslint-disable-line no-eval
+       
       "%EvalError%": $EvalError,
       "%Float16Array%": typeof Float16Array === "undefined" ? undefined2 : Float16Array,
       "%Float32Array%": typeof Float32Array === "undefined" ? undefined2 : Float32Array,
@@ -2484,7 +2484,7 @@ var require_parse = __commonJS({
         decodeDotInKeys: typeof opts.decodeDotInKeys === "boolean" ? opts.decodeDotInKeys : defaults3.decodeDotInKeys,
         decoder: typeof opts.decoder === "function" ? opts.decoder : defaults3.decoder,
         delimiter: typeof opts.delimiter === "string" || utils.isRegExp(opts.delimiter) ? opts.delimiter : defaults3.delimiter,
-        // eslint-disable-next-line no-implicit-coercion, no-extra-parens
+         
         depth: typeof opts.depth === "number" || opts.depth === false ? +opts.depth : defaults3.depth,
         duplicates,
         ignoreQueryPrefix: opts.ignoreQueryPrefix === true,
@@ -11208,7 +11208,7 @@ function toFormData(obj, formData, options) {
         key2 = removeBrackets(key2);
         arr.forEach(function each(el, index) {
           !(utils_default.isUndefined(el) || el === null) && formData.append(
-            // eslint-disable-next-line no-nested-ternary
+             
             indexes === true ? renderKey([key2], index, dots) : indexes === null ? key2 : key2 + "[]",
             convertValue(el)
           );
@@ -11424,7 +11424,7 @@ var hasBrowserEnv = typeof window !== "undefined" && typeof document !== "undefi
 var _navigator = typeof navigator === "object" && navigator || void 0;
 var hasStandardBrowserEnv = hasBrowserEnv && (!_navigator || ["ReactNative", "NativeScript", "NS"].indexOf(_navigator.product) < 0);
 var hasStandardBrowserWebWorkerEnv = (() => {
-  return typeof WorkerGlobalScope !== "undefined" && // eslint-disable-next-line no-undef
+  return typeof WorkerGlobalScope !== "undefined" &&  
   self instanceof WorkerGlobalScope && typeof self.importScripts === "function";
 })();
 var origin = hasBrowserEnv && window.location.href || "http://localhost";

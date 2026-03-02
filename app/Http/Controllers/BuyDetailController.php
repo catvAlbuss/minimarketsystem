@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\BuyDetail;
 use App\Http\Controllers\Controller;
-use App\Models\Buy;
-use App\Models\Products;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -16,14 +14,16 @@ class BuyDetailController extends Controller
      */
     public function index()
     {
-        $buy_details = BuyDetail::all();
-        $buys = Buy::all();
-        $products = Products::all();
-        return Inertia::render('buy_details/index', [
+        $buy_details = BuyDetail::with([
+            'buy.provider:id,company_name',
+            'buy.user:id,name,lastname',
+            'product:id,code,name',
+        ])
+            ->latest()
+            ->get();
+
+        return Inertia::render('buys/show', [
             'buy_details' => $buy_details,
-            'buys' => $buys,
-            'products' => $products,
-            // 'users' => $users,
         ]);
     }
 

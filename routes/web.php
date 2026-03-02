@@ -44,8 +44,10 @@ Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::resource('categories', CategoryController::class);
     Route::resource('sales', SaleController::class);
     Route::resource('sale_details', SaleDetailController::class);
+    // Custom endpoint to create an order (Buy + BuyDetails) in one request
+    Route::post('buys/order', [BuyController::class, 'order'])->name('buys.order');
     Route::resource('buys', BuyController::class);
-    Route::resource('buy_details', BuyDetailController::class);
+    Route::resource('buy_details', BuyDetailController::class)->only(['index']);
     Route::resource('providers', ProviderController::class);
     Route::resource('promotions', PromotionController::class);
     Route::resource('branches', BranchController::class)->only(['index', 'store', 'update', 'destroy']);
