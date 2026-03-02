@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             GuestCustomerSeeder::class,
             SystemBranchSeeder::class,
+            ProductsTableSeeder::class
         ]);
     }
 }
