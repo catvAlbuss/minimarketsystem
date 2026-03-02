@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Spatie\Permission\Traits\HasRoles; // IMPORTACIÓN RECUPERADA
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, TwoFactorAuthenticatable;
+    // SE AGREGA HasRoles DENTRO DEL MODELO PARA ACTIVAR LA FUNCIONALIDAD
+    use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
+
+    // Roles that have global (cross-branch) access
+    const GLOBAL_ROLES = ['root', 'gerencia', 'administracion_general'];
 
     /**
      * The attributes that are mass assignable.
@@ -19,6 +24,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'branch_id',
         'name',
         'lastname',
         'dni',
@@ -34,8 +40,7 @@ class User extends Authenticatable
         'retention',
         'entry_to_payroll',
         'role',
-        'state'
-
+        'state',
     ];
 
     /**
@@ -63,8 +68,46 @@ class User extends Authenticatable
             'two_factor_confirmed_at' => 'datetime',
         ];
     }
+
+    /**
+     * The branch this user belongs to (null = global access).
+     */
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
+
+    /**
+     * Determine if the user has global (cross-branch) access.
+     * Users with global roles see all branches; others are scoped to their branch.
+     */
+    public function isGlobalRole(): bool
+    {
+        // 1. Verificación defensiva: Si el trait está cargado y existen roles en la relación
+        // Esto evita el error "Call to a member function isNotEmpty() on null"
+        if ($this->roles && $this->roles->isNotEmpty()) {
+            foreach (self::GLOBAL_ROLES as $globalRole) {
+                if ($this->hasRole($globalRole)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 2. Fallback a la columna 'role' (Mantiene tu funcionalidad original si no hay roles de Spatie)
+        return in_array($this->role, self::GLOBAL_ROLES, true);
+    }
+
+    /**
+     * Get the branch ID this user is scoped to.
+     * Returns null if the user has global access.
+     */
+    public function scopedBranchId(): ?int
+    {
+        if ($this->isGlobalRole()) {
+            return null;
+        }
+
+        return $this->branch_id;
+    }
 }
-
-
-
-
