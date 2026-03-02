@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Concerns\HasBranchScope;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\Products;
 use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -14,8 +15,13 @@ class SaleController extends Controller
 {
     use HasBranchScope;
 
-    public function index()
+    public function index(Request $request)
     {
+        $search     = $request->string('search')->trim();
+        $branchId   = $request->integer('branch_id') ?: null;
+        $categoryId = $request->integer('category_id') ?: null;
+        $state      = $request->query('state');   // 'active' | 'inactive' | null
+
         $sales = Sale::with(['customer', 'user', 'saleDetails.product.category.branch'])
             ->when(! $this->isGlobalUser(), function ($query) {
                 // Filter sales to only those whose products belong to the user's branch
@@ -27,12 +33,30 @@ class SaleController extends Controller
             ->latest()
             ->get();
 
+        $products = Products::with('category.branch')
+            ->when(! $this->isGlobalUser(), fn($q) =>$this->scopeByBranchOnCategories($q))
+            ->when($search, fn($q) => $q->where(
+                fn($s)=>
+                $s->where('name','like',"%{$search}%")
+                    ->orWhere('code','like', "%{$search}%")
+                    ->orWhere('description','like', "%{$search}%")
+            ))
+            ->when($branchId,   fn($q) => $q->whereHas('category', fn($c) => $c->where('id_branches', $branchId)))
+            ->when($categoryId, fn($q) => $q->where('id_categories', $categoryId))
+            ->when($state,      fn($q) => $q->where('state', $state))
+            ->orderBy('name')
+            ->paginate(25)
+            ->withQueryString();
+
+        Log:info($products);
+
         $customers = Customer::all(['id', 'name', 'last_name', 'dni']);
         $users = $this->isGlobalUser()
             ? User::all(['id', 'name', 'lastname'])
             : User::where('branch_id', $this->currentBranchId())->orWhereNull('branch_id')->get(['id', 'name', 'lastname']);
 
         return Inertia::render('sales/index', [
+            'products' => $products,
             'sales' => $sales,
             'customers' => $customers,
             'users' => $users,
