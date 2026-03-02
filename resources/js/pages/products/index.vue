@@ -34,15 +34,22 @@ type Products = {
     expiration_date: string;
     promotion_discount: number;
     state: 'active' | 'inactive';
+    image: string | null;
+};
+
+type PaginatedProducts = {
+    data: Products[];
 };
 
 type props = {
-    products: Products[];
+    products: Products[] | PaginatedProducts;
     categories: Category[];
 };
 
 const props = defineProps<props>();
-const products = computed(() => props.products);
+const products = computed<Products[]>(() =>
+    Array.isArray(props.products) ? props.products : props.products?.data ?? [],
+);
 const categories = computed(() => props.categories)
 
 const editingId = ref<number | null>(null);
@@ -58,7 +65,21 @@ const form = useForm({
     expiration_date: '',
     promotion_discount: 0,
     state: 'active',
+    image: null as File | null,
 });
+
+// Image preview URL (local blob for new uploads, or existing URL)
+const imagePreviewUrl = ref<string | null>(null);
+
+const onFileChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    form.image = file;
+    if (file) {
+        imagePreviewUrl.value = URL.createObjectURL(file);
+    } else {
+        imagePreviewUrl.value = null;
+    }
+};
 
 const deleteForm = useForm({});
 const deleteError = computed(() => (deleteForm.errors as Record<string, string | undefined>).delete);
@@ -66,10 +87,12 @@ const deleteError = computed(() => (deleteForm.errors as Record<string, string |
 const isEditing = computed(() => editingId.value !== null);
 
 const resetForm = (): void => {
-    editingId.value=null;
+    editingId.value = null;
     form.reset();
     form.clearErrors();
     form.id_categories = props.categories?.[0]?.id ?? '';
+    form.image = null;
+    imagePreviewUrl.value = null;
 };
 
 const startEdit = (products: Products): void => {
@@ -85,15 +108,21 @@ const startEdit = (products: Products): void => {
     form.expiration_date = products.expiration_date;
     form.promotion_discount = products.promotion_discount;
     form.state = products.state;
+    form.image = null;
+    // Show existing image as preview
+    imagePreviewUrl.value = products.image ?? null;
 };
 
 const submit = (): void => {
     const options = {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => resetForm(),
     };
     if (isEditing.value && editingId.value !== null) {
-        form.put(ProductsController.update.url(editingId.value), options);
+        // Laravel requires _method spoofing for PUT with multipart/form-data
+        form.transform((data) => ({ ...data, _method: 'PUT' }))
+            .post(ProductsController.update.url(editingId.value), options);
         return;
     }
     form.post(ProductsController.store.url(), options);
@@ -343,6 +372,37 @@ const remove = (products: Products): void => {
                         <InputError :message="form.errors.state" />
                     </div>
 
+                    <!-- Imagen -->
+                    <div class="space-y-2 md:col-span-2">
+                        <Label for="image" class="text-sm font-medium text-gray-700">Imagen del producto</Label>
+                        <div class="flex items-center gap-4">
+                            <!-- Preview -->
+                            <div class="flex-shrink-0">
+                                <img
+                                    v-if="imagePreviewUrl"
+                                    :src="imagePreviewUrl"
+                                    alt="Vista previa"
+                                    class="h-20 w-20 rounded-xl object-cover border border-gray-200 shadow-sm"
+                                />
+                                <div v-else class="flex h-20 w-20 items-center justify-center rounded-xl bg-gray-100 border border-dashed border-gray-300 text-2xl text-gray-400">
+                                    📷
+                                </div>
+                            </div>
+                            <!-- Input -->
+                            <div class="flex-1">
+                                <input
+                                    id="image"
+                                    type="file"
+                                    accept="image/*"
+                                    class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100 focus:outline-none"
+                                    @change="onFileChange"
+                                />
+                                <p class="mt-1 text-xs text-gray-500">JPG, PNG, WEBP · máx. 2 MB. {{ isEditing ? 'Deja vacío para conservar la imagen actual.' : '' }}</p>
+                                <InputError :message="(form.errors as any).image" />
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Botones -->
                     <div class="col-span-full flex gap-3 pt-2">
                         <Button 
@@ -393,6 +453,7 @@ const remove = (products: Products): void => {
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-4 py-3 text-left font-semibold text-gray-700">Imagen</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Producto</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Código</th>
                                 <th class="px-4 py-3 text-left font-semibold text-gray-700">Categoría</th>
@@ -405,7 +466,7 @@ const remove = (products: Products): void => {
                         </thead>
                         <tbody>
                             <tr v-if="products.length === 0">
-                                <td colspan="8" class="px-4 py-12 text-center">
+                                <td colspan="9" class="px-4 py-12 text-center">
                                     <div class="flex flex-col items-center gap-3">
                                         <svg class="h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -425,6 +486,17 @@ const remove = (products: Products): void => {
                                 :key="p.id" 
                                 class="border-t border-gray-100 transition-colors hover:bg-gray-50"
                             >
+                                <td class="px-4 py-3">
+                                    <img
+                                        v-if="p.image"
+                                        :src="p.image"
+                                        :alt="p.name"
+                                        class="h-12 w-12 rounded-lg object-cover border border-gray-200"
+                                    />
+                                    <div v-else class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 text-gray-400 text-xs">
+                                        📷
+                                    </div>
+                                </td>
                                 <td class="px-4 py-3">
                                     <div>
                                         <p class="font-semibold text-gray-900">{{ p.name }}</p>
@@ -497,4 +569,3 @@ const remove = (products: Products): void => {
         </main>
     </AppLayout>
 </template>
-

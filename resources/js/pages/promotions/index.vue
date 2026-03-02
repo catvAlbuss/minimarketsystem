@@ -14,6 +14,7 @@ type Promotion = {
     name_promotion: string;
     price: number;
     state: string;
+    image: string | null;
 };
 
 type AddProducts = {
@@ -40,8 +41,17 @@ const AddProduct = ref<AddProducts[]>([]);
 
 const form = useForm({
     name_promotion: '',
-    state: ''
+    state: '',
 });
+
+const imageFile = ref<File | null>(null);
+const imagePreviewUrl = ref<string | null>(null);
+
+const onImageChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    imageFile.value = file;
+    imagePreviewUrl.value = file ? URL.createObjectURL(file) : null;
+};
 
 const props = defineProps<Props>();
 const promotion = computed(() => props.promotions);
@@ -114,6 +124,8 @@ const resetData = () => {
     editingId.value = null;
     form.reset();
     AddProduct.value = [];
+    imageFile.value = null;
+    imagePreviewUrl.value = null;
 };
 
 const crearPromotion = async () => {
@@ -126,17 +138,21 @@ const crearPromotion = async () => {
         return;
     }
 
-    const data = {
-        item: AddProduct.value.map((item) => ({
-            id: item.id,
-        })),
-        name_promotion: form.name_promotion,
-        price: total.value,
-        state: form.state,
-    };
+    const formData = new FormData();
+    formData.append('name_promotion', form.name_promotion);
+    formData.append('price', String(total.value));
+    formData.append('state', form.state);
+    if (imageFile.value) {
+        formData.append('image', imageFile.value);
+    }
+    AddProduct.value.forEach((item, index) => {
+        formData.append(`item[${index}][id]`, String(item.id));
+    });
 
     if (isEditing.value && editingId.value !== null) {
-        router.put(`/promotions/${editingId.value}`, data, {
+        formData.append('_method', 'PUT');
+        router.post(`/promotions/${editingId.value}`, formData as any, {
+            forceFormData: true,
             onSuccess: () => {
                 resetData();
                 alert('Promoción Actualizada');
@@ -144,8 +160,9 @@ const crearPromotion = async () => {
             onError: (errors) => form.setError(errors),
         });
     } else {
-        router.post('/promotions', data, {
+        router.post('/promotions', formData as any, {
             preserveScroll: true,
+            forceFormData: true,
             onSuccess: () => {
                 resetData();
                 alert('Promoción creada.');
@@ -159,6 +176,8 @@ const startEdit = (prom: Promotion): void => {
     editingId.value = prom.id;
     form.name_promotion = prom.name_promotion;
     form.state = prom.state;
+    imageFile.value = null;
+    imagePreviewUrl.value = prom.image ?? null;
 
     AddProduct.value = [];
 
@@ -296,6 +315,7 @@ const remove = (prom: Promotion): void => {
                         <table class="w-full text-sm">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th class="px-4 py-3 text-left font-semibold text-gray-700">Imagen</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">ID Producto</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Nombre Promoción</th>
                                     <th class="px-4 py-3 text-left font-semibold text-gray-700">Precio</th>
@@ -305,7 +325,7 @@ const remove = (prom: Promotion): void => {
                             </thead>
                             <tbody>
                                 <tr v-if="promotion.length === 0">
-                                    <td colspan="5" class="px-4 py-12 text-center">
+                                    <td colspan="6" class="px-4 py-12 text-center">
                                         <div class="flex flex-col items-center gap-3">
                                             <svg class="h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
@@ -319,6 +339,17 @@ const remove = (prom: Promotion): void => {
                                     :key="prom.id" 
                                     class="border-t border-gray-100 transition-colors hover:bg-gray-50"
                                 >
+                                    <td class="px-4 py-3">
+                                        <img
+                                            v-if="prom.image"
+                                            :src="prom.image"
+                                            :alt="prom.name_promotion"
+                                            class="h-12 w-12 rounded-lg object-cover border border-gray-200"
+                                        />
+                                        <div v-else class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-50 text-lg">
+                                            🏷️
+                                        </div>
+                                    </td>
                                     <td class="px-4 py-3">
                                         <span class="rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700">#{{ prom.id_products }}</span>
                                     </td>
@@ -527,6 +558,34 @@ const remove = (prom: Promotion): void => {
                                     </select>
                                     <InputError :message="form.errors.state" />
                                 </div>
+                            </div>
+
+                            <!-- Imagen del Combo -->
+                            <div>
+                                <Label for="promo_image" class="text-sm font-medium text-gray-700">
+                                    Imagen del combo (opcional)
+                                </Label>
+                                <div class="mt-1 flex items-center gap-4">
+                                    <div class="flex-shrink-0">
+                                        <img
+                                            v-if="imagePreviewUrl"
+                                            :src="imagePreviewUrl"
+                                            alt="Vista previa"
+                                            class="h-16 w-16 rounded-xl object-cover border border-gray-200"
+                                        />
+                                        <div v-else class="flex h-16 w-16 items-center justify-center rounded-xl bg-orange-50 border border-dashed border-orange-200 text-2xl">
+                                            🏷️
+                                        </div>
+                                    </div>
+                                    <input
+                                        id="promo_image"
+                                        type="file"
+                                        accept="image/*"
+                                        class="flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-blue-700 hover:file:bg-blue-100 focus:outline-none"
+                                        @change="onImageChange"
+                                    />
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">JPG, PNG, WEBP · máx. 2 MB. {{ isEditing ? 'Deja vacío para conservar la imagen actual.' : '' }}</p>
                             </div>
 
                             <div class="flex items-center gap-3 pt-2">

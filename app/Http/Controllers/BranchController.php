@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\HasBranchScope;
 use App\Models\Branch;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,60 +11,58 @@ use Inertia\Response;
 
 class BranchController extends Controller
 {
+    use HasBranchScope;
+
     /**
-     * Lista las sucursales.
+     * Lista las sucursales. Solo usuarios globales ven todas; los demás no tienen acceso.
      */
     public function index(): Response
     {
-        // Cargamos también el usuario encargado para mostrarlo si es necesario
-        $branches = Branch::with('user')->get(); 
-        
+        abort_if(! $this->isGlobalUser(), 403, 'Solo los administradores globales pueden gestionar sucursales.');
+
+        $branches = Branch::with('user')->get();
+
         return Inertia::render('branches/index', [
             'branches' => $branches,
-            // Enviamos los usuarios para el selector al crear/editar
-            'users' => User::all(['id', 'name']) 
+            'users' => User::all(['id', 'name']),
         ]);
     }
 
     /**
-     * Guarda una nueva sucursal.
+     * Guarda una nueva sucursal. Solo usuarios globales.
      */
     public function store(Request $request)
     {
-       $validated = $request->validate([
-            'id_users'     => ['required','exists:users,id'],
-            'name'         => ['required','string','max:255'],
-            'address'      => ['required','string'],
+        abort_if(! $this->isGlobalUser(), 403, 'Solo los administradores globales pueden crear sucursales.');
+
+        $validated = $request->validate([
+            'id_users' => ['required', 'exists:users,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string'],
             'opening_time' => ['required'],
             'closing_time' => ['required'],
-            'state'        => ['required','in:active,inactive'],
+            'state' => ['required', 'in:active,inactive'],
         ]);
 
-
-        Branch::create([
-            'id_users'     => $validated['id_users'],
-            'name'         => $validated['name'],
-            'address'      => $validated['address'],
-            'opening_time' => $validated['opening_time'],
-            'closing_time' => $validated['closing_time'],
-            'state'        => $validated['state'],
-        ]);
+        Branch::create($validated);
 
         return to_route('branches.index');
     }
 
     /**
-     * Actualiza una sucursal existente.
+     * Actualiza una sucursal existente. Solo usuarios globales.
      */
     public function update(Request $request, Branch $branch)
     {
+        abort_if(! $this->isGlobalUser(), 403, 'Solo los administradores globales pueden editar sucursales.');
+
         $validated = $request->validate([
-            'id_users'     => 'required|exists:users,id',
-            'name'         => 'required|string|max:255',
-            'address'      => 'required|string',
+            'id_users' => 'required|exists:users,id',
+            'name' => 'required|string|max:255',
+            'address' => 'required|string',
             'opening_time' => 'required',
             'closing_time' => 'required',
-            'state'        => 'required|in:active,inactive',
+            'state' => 'required|in:active,inactive',
         ]);
 
         $branch->update($validated);
@@ -72,11 +71,14 @@ class BranchController extends Controller
     }
 
     /**
-     * Elimina una sucursal.
+     * Elimina una sucursal. Solo usuarios globales.
      */
     public function destroy(Branch $branch)
     {
+        abort_if(! $this->isGlobalUser(), 403, 'Solo los administradores globales pueden eliminar sucursales.');
+
         $branch->delete();
+
         return redirect()->back()->with('message', 'Sucursal eliminada');
     }
 }
