@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import SaleController from '@/actions/App/Http/Controllers/SaleController';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import SaleController from '@/actions/App/Http/Controllers/SaleController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

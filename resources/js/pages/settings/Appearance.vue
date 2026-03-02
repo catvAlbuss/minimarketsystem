@@ -4,12 +4,12 @@ import AppearanceTabs from '@/components/AppearanceTabs.vue';
 import Heading from '@/components/Heading.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
-import { type BreadcrumbItem } from '@/types';
 import { edit } from '@/routes/appearance';
+import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
+        title: 'Configuración de apariencia',
         href: edit().url,
     },
 ];
@@ -17,16 +17,16 @@ const breadcrumbItems: BreadcrumbItem[] = [
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Appearance settings" />
+        <Head title="Configuración de apariencia" />
 
-        <h1 class="sr-only">Appearance Settings</h1>
+        <h1 class="sr-only">Configuración de apariencia</h1>
 
         <SettingsLayout>
             <div class="space-y-6">
                 <Heading
                     variant="small"
-                    title="Appearance settings"
-                    description="Update your account's appearance settings"
+                    title="Configuración de apariencia"
+                    description="Personaliza el modo visual de tu cuenta"
                 />
                 <AppearanceTabs />
             </div>
