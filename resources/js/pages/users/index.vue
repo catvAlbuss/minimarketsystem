@@ -163,34 +163,26 @@ const roleLabel = (role: string) =>
 
 const roleBadgeClass = (role: string) => {
     const map: Record<string, string> = {
-        root: 'bg-purple-100 text-purple-700',
-        managment: 'bg-blue-100 text-blue-700',
-        administrator_general: 'bg-indigo-100 text-indigo-700',
-        logistic_general: 'bg-cyan-100 text-cyan-700',
-        administrator: 'bg-sky-100 text-sky-700',
-        logistic: 'bg-teal-100 text-teal-700',
-        cashier: 'bg-green-100 text-green-700',
-        asistente: 'bg-gray-100 text-gray-600',
-        cliente: 'bg-yellow-100 text-yellow-700',
+        root: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+        managment: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+        administrator_general: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+        logistic_general: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400',
+        administrator: 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-400',
+        logistic: 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400',
+        cashier: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+        asistente: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
     };
-    return map[role] ?? 'bg-gray-100 text-gray-600';
+    return map[role] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400';
 };
-
-const inputClass =
-    'w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#2b4485] focus:border-[#2b4485] transition-colors';
-const selectClass =
-    'w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#2b4485] focus:border-[#2b4485] transition-colors';
-const disabledClass =
-    'w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-400 cursor-not-allowed';
 </script>
 
 <template>
-
     <Head title="Usuarios" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="min-h-screen space-y-6 bg-gray-50 p-6 md:p-8">
+        <div class="min-h-screen space-y-6 bg-gray-50 dark:bg-gray-900 p-6 md:p-8">
             <div class="space-y-6 p-4">
+                <!-- (Código comentado original) -->
                 <!-- <section
                     class="rounded-xl border border-sidebar-border/70 bg-background p-4"
                 >
@@ -302,17 +294,17 @@ const disabledClass =
                 </section> -->
                 <!-- ── Header ── -->
                 <div
-                    class="flex flex-col justify-between gap-4 rounded-xl border border-gray-100 bg-white px-6 py-5 shadow-sm sm:flex-row sm:items-center">
+                    class="flex flex-col justify-between gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-5 shadow-sm sm:flex-row sm:items-center">
                     <div>
-                        <h1 class="text-2xl font-bold tracking-tight text-gray-900">
+                        <h1 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                             Gestión de Usuarios
                         </h1>
-                        <p class="mt-0.5 text-sm text-gray-500">
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                             Administra roles, accesos y personal del sistema
                         </p>
                     </div>
                     <button @click="prepararNuevo"
-                        class="flex items-center gap-2 rounded-lg bg-[#2b4485] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#1a3366]">
+                        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 dark:shadow-blue-500/30 transition-all hover:bg-blue-700 dark:hover:bg-blue-600 hover:scale-105 hover:shadow-blue-600/50 dark:hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
@@ -322,53 +314,53 @@ const disabledClass =
 
                 <!-- ── KPIs ── -->
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2b4485]/10">
-                            <svg class="h-6 w-6 text-[#2b4485]" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                    <div class="flex items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+                            <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                            <p class="text-xs font-medium tracking-wide text-gray-500 dark:text-gray-400 uppercase">
                                 Total Usuarios
                             </p>
-                            <p class="mt-0.5 text-3xl font-bold text-gray-800">
+                            <p class="mt-0.5 text-3xl font-bold text-gray-900 dark:text-white">
                                 {{ totalUsuarios }}
                             </p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50">
-                            <svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                    <div class="flex items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30">
+                            <svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                            <p class="text-xs font-medium tracking-wide text-gray-500 dark:text-gray-400 uppercase">
                                 Activos
                             </p>
-                            <p class="mt-0.5 text-3xl font-bold text-green-600">
+                            <p class="mt-0.5 text-3xl font-bold text-green-600 dark:text-green-400">
                                 {{ usuariosActivos }}
                             </p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50">
-                            <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                    <div class="flex items-center gap-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
+                            <svg class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                                 stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                            <p class="text-xs font-medium tracking-wide text-gray-500 dark:text-gray-400 uppercase">
                                 Administradores
                             </p>
-                            <p class="mt-0.5 text-3xl font-bold text-indigo-600">
+                            <p class="mt-0.5 text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                                 {{ admins }}
                             </p>
                         </div>
@@ -376,19 +368,19 @@ const disabledClass =
                 </div>
 
                 <!-- ── Búsqueda + Tabla ── -->
-                <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+                <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
                     <!-- Barra de búsqueda -->
-                    <div class="border-b border-gray-100 px-6 py-4">
+                    <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
                         <div class="relative max-w-sm">
-                            <svg class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
+                            <svg class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                                 fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" />
                             </svg>
                             <input v-model="searchQuery" type="text" placeholder="Buscar por nombre, email o DNI..."
-                                class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pr-8 pl-9 text-sm text-gray-900 placeholder-gray-400 transition-all focus:border-[#2b4485] focus:bg-white focus:ring-2 focus:ring-[#2b4485] focus:outline-none" />
+                                class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 py-2 pr-8 pl-9 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:bg-white dark:focus:bg-gray-800 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:outline-none" />
                             <button v-if="searchQuery" @click="searchQuery = ''"
-                                class="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                class="absolute top-1/2 right-2.5 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
                                     stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -396,15 +388,15 @@ const disabledClass =
                             </button>
                         </div>
                         <!-- mensaje del Search -->
-                        <p class="mt-1.5 text-xs text-gray-400">
+                        <p class="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                             <template v-if="searchQuery">
-                                <span class="font-medium text-[#2b4485]">{{
+                                <span class="font-medium text-blue-600 dark:text-blue-400">{{
                                     usuariosFiltrados.length
                                     }}</span>
                                 resultado{{
                                     usuariosFiltrados.length !== 1 ? 's' : ''
                                 }}
-                                para "<span class="font-medium text-gray-600">{{
+                                para "<span class="font-medium text-gray-700 dark:text-gray-300">{{
                                     searchQuery
                                     }}</span>"
                             </template>
@@ -420,42 +412,42 @@ const disabledClass =
                     <!-- Tabla -->
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
-                            <thead class="border-b border-gray-100 bg-gray-50">
+                            <thead class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
                                 <tr>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Usuario
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Correo
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         DNI
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Teléfono
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Rol
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Estado
                                     </th>
                                     <th
-                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500 uppercase">
+                                        class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 dark:text-gray-400 uppercase">
                                         Acciones
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-50">
+                            <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                 <tr v-if="usuariosFiltrados.length === 0">
-                                    <td colspan="7" class="px-5 py-10 text-center text-gray-400">
-                                        <svg class="mx-auto mb-2 h-10 w-10 text-gray-300" fill="none"
+                                    <td colspan="7" class="px-5 py-10 text-center text-gray-500 dark:text-gray-400">
+                                        <svg class="mx-auto mb-2 h-10 w-10 text-gray-300 dark:text-gray-600" fill="none"
                                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
@@ -466,11 +458,11 @@ const disabledClass =
                                     </td>
                                 </tr>
                                 <tr v-for="user in usuariosFiltrados" :key="user.id"
-                                    class="group transition-colors hover:bg-blue-50/30">
+                                    class="group transition-colors hover:bg-blue-50/30 dark:hover:bg-blue-900/20">
                                     <td class="px-5 py-3.5">
                                         <div class="flex items-center gap-3">
                                             <div
-                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#2b4485] text-xs font-bold text-white">
+                                                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 dark:bg-blue-500 text-xs font-bold text-white">
                                                 {{
                                                     user.name
                                                         .charAt(0)
@@ -482,23 +474,23 @@ const disabledClass =
                                                 }}
                                             </div>
                                             <div>
-                                                <p class="text-sm leading-tight font-semibold text-gray-800">
+                                                <p class="text-sm leading-tight font-semibold text-gray-900 dark:text-white">
                                                     {{ user.name }}
                                                     {{ user.lastname }}
                                                 </p>
-                                                <p class="mt-0.5 text-xs text-gray-400">
+                                                <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                                                     ID #{{ user.id }}
                                                 </p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="px-5 py-3.5 text-sm text-gray-600">
+                                    <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">
                                         {{ user.email }}
                                     </td>
-                                    <td class="px-5 py-3.5 font-mono text-sm text-gray-600">
+                                    <td class="px-5 py-3.5 font-mono text-sm text-gray-600 dark:text-gray-400">
                                         {{ user.dni }}
                                     </td>
-                                    <td class="px-5 py-3.5 text-sm text-gray-600">
+                                    <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">
                                         {{ user.phone }}
                                     </td>
                                     <td class="px-5 py-3.5">
@@ -512,12 +504,12 @@ const disabledClass =
                                         <span
                                             class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
                                             :class="user.state === 'active'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-500'
+                                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                                                 ">
                                             <span class="h-1.5 w-1.5 rounded-full" :class="user.state === 'active'
-                                                    ? 'bg-green-500'
-                                                    : 'bg-gray-400'
+                                                    ? 'bg-green-500 dark:bg-green-400'
+                                                    : 'bg-gray-400 dark:bg-gray-500'
                                                 "></span>
                                             {{
                                                 user.state === 'active'
@@ -532,7 +524,7 @@ const disabledClass =
                                             <button @click="startEdit(user)" :disabled="form.processing ||
                                                 deleteForm.processing
                                                 "
-                                                class="flex items-center gap-1.5 rounded-lg border border-[#2b4485]/30 px-3 py-1.5 text-xs font-medium text-[#2b4485] transition-all hover:bg-[#2b4485] hover:text-white disabled:opacity-50">
+                                                class="flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50">
                                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -543,7 +535,7 @@ const disabledClass =
                                             <button @click="remove(user)" :disabled="form.processing ||
                                                 deleteForm.processing
                                                 "
-                                                class="flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-500 transition-all hover:bg-red-500 hover:text-white disabled:opacity-50">
+                                                class="flex items-center gap-1.5 rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 transition-all hover:bg-red-100 dark:hover:bg-red-900/50 disabled:opacity-50">
                                                 <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"
                                                     stroke-width="2" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -568,21 +560,21 @@ const disabledClass =
     <Teleport to="body">
         <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
             <!-- Backdrop -->
-            <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" @click="resetForm"></div>
+            <div class="absolute inset-0 bg-gray-900/60 dark:bg-gray-950/80 backdrop-blur-sm" @click="resetForm"></div>
 
             <!-- Panel -->
-            <div class="relative z-10 flex max-h-[92vh] w-full max-w-4xl flex-col rounded-2xl bg-white shadow-2xl">
+            <div class="relative z-10 flex max-h-[92vh] w-full max-w-4xl flex-col rounded-2xl bg-white dark:bg-gray-800 shadow-2xl">
                 <!-- Header -->
-                <div class="flex shrink-0 items-center justify-between border-b border-gray-100 px-7 py-5">
+                <div class="flex shrink-0 items-center justify-between border-b border-gray-200 dark:border-gray-700 px-7 py-5">
                     <div>
-                        <h3 class="text-xl font-bold text-gray-900">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                             {{
                                 isEditing
                                     ? 'Editar Usuario'
                                     : 'Registrar Nuevo Usuario'
                             }}
                         </h3>
-                        <p class="mt-0.5 text-sm text-gray-400">
+                        <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
                             {{
                                 isEditing
                                     ? 'Modifica los datos del usuario seleccionado'
@@ -591,7 +583,7 @@ const disabledClass =
                         </p>
                     </div>
                     <button @click="resetForm"
-                        class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                        class="rounded-lg p-2 text-gray-400 dark:text-gray-500 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300">
                         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -603,129 +595,122 @@ const disabledClass =
                     <!-- Sección: Datos Personales -->
                     <div>
                         <div class="mb-4 flex items-center gap-2">
-                            <div class="h-5 w-1 rounded-full bg-[#2b4485]"></div>
-                            <h4 class="text-sm font-bold tracking-wide text-gray-700 uppercase">
+                            <div class="h-5 w-1 rounded-full bg-blue-600 dark:bg-blue-500"></div>
+                            <h4 class="text-sm font-bold tracking-wide text-gray-700 dark:text-gray-300 uppercase">
                                 Datos Personales
                             </h4>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Nombre *</label>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre *</label>
                                 <input v-model="form.name" type="text" required placeholder="Ej: Jorge"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.name" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Apellido *</label>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Apellido *</label>
                                 <input v-model="form.lastname" type="text" required placeholder="Ej: Almeida"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.lastname" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     DNI *
-                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-400">(no
+                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">(no
                                         editable)</span>
                                 </label>
-                                <input v-model="form.dni" type="text" :disabled="isEditing" required :class="isEditing ? disabledClass : inputClass
-                                    " placeholder="12345678" />
+                                <input v-model="form.dni" type="text" :disabled="isEditing" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed"
+                                    placeholder="12345678" />
                                 <InputError :message="form.errors.dni" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Celular *</label>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Celular *</label>
                                 <input v-model="form.phone" type="text" required placeholder="987654321"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.phone" />
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Dirección *</label>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Dirección *</label>
                                 <input v-model="form.address" type="text" required placeholder="Ej: Jr. 28 de Julio 123"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.address" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">N° de Hijos</label>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">N° de Hijos</label>
                                 <input v-model="form.children" type="number" min="0" placeholder="0"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.children" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Divider -->
-                    <hr class="border-gray-100" />
+                    <hr class="border-gray-200 dark:border-gray-700" />
 
                     <!-- Sección: Datos Laborales -->
                     <div>
                         <div class="mb-4 flex items-center gap-2">
-                            <div class="h-5 w-1 rounded-full bg-indigo-400"></div>
-                            <h4 class="text-sm font-bold tracking-wide text-gray-700 uppercase">
+                            <div class="h-5 w-1 rounded-full bg-indigo-500 dark:bg-indigo-400"></div>
+                            <h4 class="text-sm font-bold tracking-wide text-gray-700 dark:text-gray-300 uppercase">
                                 Datos Laborales
                             </h4>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Afiliado *</label>
-                                <select v-model="form.affiliate" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Afiliado *</label>
+                                <select v-model="form.affiliate" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar...</option>
                                     <option value="ONP">ONP</option>
                                     <option value="AFP">AFP</option>
                                 </select>
                                 <InputError :message="form.errors.affiliate" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Asegurado *</label>
-                                <select v-model="form.insured" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Asegurado *</label>
+                                <select v-model="form.insured" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar...</option>
                                     <option value="EsSalud">EsSalud</option>
                                     <option value="SIS">SIS</option>
                                 </select>
                                 <InputError :message="form.errors.insured" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Modalidad de Trabajo
-                                    *</label>
-                                <select v-model="form.work_modality" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Modalidad de Trabajo *</label>
+                                <select v-model="form.work_modality" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar...</option>
                                     <option value="fullTime">Full Time</option>
                                     <option value="partTime">Part Time</option>
                                 </select>
                                 <InputError :message="form.errors.work_modality" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Fecha de Ingreso
-                                    <span v-if="isEditing"
-                                        class="ml-1 text-xs font-normal text-gray-400">(opcional)</span>
+                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">(opcional)</span>
                                 </label>
                                 <input v-model="form.entry_date" type="date" :required="!isEditing"
-                                    :class="inputClass" />
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.entry_date" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Retención *</label>
-                                <select v-model="form.retention" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Retención *</label>
+                                <select v-model="form.retention" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar...</option>
                                     <option value="yes">Sí</option>
                                     <option value="no">No</option>
                                 </select>
                                 <InputError :message="form.errors.retention" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Ingreso a Planilla
-                                    *</label>
-                                <select v-model="form.entry_to_payroll" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Ingreso a Planilla *</label>
+                                <select v-model="form.entry_to_payroll" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar...</option>
                                     <option value="yes">Sí</option>
                                     <option value="no">No</option>
                                 </select>
@@ -735,45 +720,38 @@ const disabledClass =
                     </div>
 
                     <!-- Divider -->
-                    <hr class="border-gray-100" />
+                    <hr class="border-gray-200 dark:border-gray-700" />
 
                     <!-- Sección: Acceso al Sistema -->
                     <div>
                         <div class="mb-4 flex items-center gap-2">
-                            <div class="h-5 w-1 rounded-full bg-green-400"></div>
-                            <h4 class="text-sm font-bold tracking-wide text-gray-700 uppercase">
+                            <div class="h-5 w-1 rounded-full bg-green-500 dark:bg-green-400"></div>
+                            <h4 class="text-sm font-bold tracking-wide text-gray-700 dark:text-gray-300 uppercase">
                                 Acceso al Sistema
                             </h4>
                         </div>
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Correo Electrónico *
-                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-400">(no
+                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">(no
                                         editable)</span>
                                 </label>
                                 <input v-model="form.email" type="email" :disabled="isEditing" required
-                                    placeholder="Ej: usuario@empresa.com" :class="isEditing ? disabledClass : inputClass
-                                        " />
+                                    placeholder="Ej: usuario@empresa.com"
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed" />
                                 <InputError :message="form.errors.email" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Rol *</label>
-                                <select v-model="form.role" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar rol...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Rol *</label>
+                                <select v-model="form.role" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar rol...</option>
                                     <option value="root">Root</option>
                                     <option value="managment">Gerencia</option>
-                                    <option value="administrator_general">
-                                        Administrador General
-                                    </option>
-                                    <option value="logistic_general">
-                                        Logística General
-                                    </option>
-                                    <option value="administrator">
-                                        Administrador
-                                    </option>
+                                    <option value="administrator_general">Administrador General</option>
+                                    <option value="logistic_general">Logística General</option>
+                                    <option value="administrator">Administrador</option>
                                     <option value="logistic">Logística</option>
                                     <option value="cashier">Cajero</option>
                                     <option value="asistente">Asistente</option>
@@ -782,34 +760,35 @@ const disabledClass =
                                 <InputError :message="form.errors.role" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">Estado *</label>
-                                <select v-model="form.state" required :class="selectClass">
-                                    <option value="" disabled>
-                                        Seleccionar estado...
-                                    </option>
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Estado *</label>
+                                <select v-model="form.state" required
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20">
+                                    <option value="" disabled>Seleccionar estado...</option>
                                     <option value="active">Activo</option>
                                     <option value="inactive">Inactivo</option>
                                 </select>
                                 <InputError :message="form.errors.state" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Contraseña
-                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-400">(opcional en
+                                    <span v-if="isEditing" class="ml-1 text-xs font-normal text-gray-500 dark:text-gray-400">(opcional en
                                         edición)</span>
-                                    <span v-else class="ml-0.5 text-red-500">*</span>
+                                    <span v-else class="ml-0.5 text-red-500 dark:text-red-400">*</span>
                                 </label>
                                 <input v-model="form.password" type="password" :required="!isEditing"
-                                    placeholder="Mínimo 8 caracteres" :class="inputClass" />
+                                    placeholder="Mínimo 8 caracteres"
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                                 <InputError :message="form.errors.password" />
                             </div>
                             <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700">
+                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     Confirmar Contraseña
-                                    <span v-if="!isEditing" class="ml-0.5 text-red-500">*</span>
+                                    <span v-if="!isEditing" class="ml-0.5 text-red-500 dark:text-red-400">*</span>
                                 </label>
                                 <input v-model="form.password_confirmation" type="password" :required="!isEditing"
-                                    placeholder="Repite la contraseña" :class="inputClass" />
+                                    placeholder="Repite la contraseña"
+                                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 px-3 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20" />
                             </div>
                         </div>
                     </div>
@@ -817,9 +796,9 @@ const disabledClass =
 
                 <!-- Footer -->
                 <div
-                    class="flex shrink-0 flex-col gap-3 rounded-b-2xl border-t border-gray-100 bg-gray-50 px-7 py-5 sm:flex-row-reverse">
+                    class="flex shrink-0 flex-col gap-3 rounded-b-2xl border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-7 py-5 sm:flex-row-reverse">
                     <button type="button" @click="submit" :disabled="form.processing || deleteForm.processing"
-                        class="flex w-full items-center justify-center gap-2 rounded-lg bg-[#2b4485] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#1a3366] disabled:opacity-50 sm:w-auto">
+                        class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 dark:bg-blue-500 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 dark:shadow-blue-500/30 transition-all hover:bg-blue-700 dark:hover:bg-blue-600 hover:scale-105 hover:shadow-blue-600/50 dark:hover:shadow-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 sm:w-auto">
                         <svg v-if="form.processing" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
                             <path class="opacity-75" fill="currentColor"
@@ -828,7 +807,7 @@ const disabledClass =
                         {{ isEditing ? 'Actualizar Usuario' : 'Crear Usuario' }}
                     </button>
                     <button type="button" @click="resetForm"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto">
+                        class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-6 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-gray-700 sm:w-auto">
                         Cancelar
                     </button>
                 </div>
