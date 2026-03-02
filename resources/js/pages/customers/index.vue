@@ -58,6 +58,7 @@ const isEditing = computed(() => editingId.value !== null);
 const resetForm = (): void => {
     form.reset();
     deleteForm.reset();
+    editingId.value = null;
 };
 
 const startEdit = (customer: Customer): void => {
