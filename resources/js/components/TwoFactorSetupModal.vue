@@ -21,8 +21,8 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/composables/useAppearance';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
-import type { TwoFactorConfigContent } from '@/types';
 import { confirm } from '@/routes/two-factor';
+import type { TwoFactorConfigContent } from '@/types';
 
 type Props = {
     requiresConfirmation: boolean;
@@ -46,26 +46,26 @@ const pinInputContainerRef = useTemplateRef('pinInputContainerRef');
 const modalConfig = computed<TwoFactorConfigContent>(() => {
     if (props.twoFactorEnabled) {
         return {
-            title: 'Two-Factor Authentication Enabled',
+            title: 'Autenticación en dos pasos activada',
             description:
-                'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
-            buttonText: 'Close',
+                'La autenticación en dos pasos está activa. Escanea el código QR o ingresa la clave manual en tu aplicación autenticadora.',
+            buttonText: 'Cerrar',
         };
     }
 
     if (showVerificationStep.value) {
         return {
-            title: 'Verify Authentication Code',
-            description: 'Enter the 6-digit code from your authenticator app',
-            buttonText: 'Continue',
+            title: 'Verificar código de autenticación',
+            description: 'Ingresa el código de 6 dígitos de tu aplicación autenticadora',
+            buttonText: 'Continuar',
         };
     }
 
     return {
-        title: 'Enable Two-Factor Authentication',
+        title: 'Activar autenticación en dos pasos',
         description:
-            'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
-        buttonText: 'Continue',
+            'Para finalizar la activación, escanea el código QR o ingresa la clave manual en tu aplicación autenticadora',
+        buttonText: 'Continuar',
     };
 });
 
@@ -110,13 +110,13 @@ watch(
 
 <template>
     <Dialog :open="isOpen" @update:open="isOpen = $event">
-        <DialogContent class="sm:max-w-md">
+        <DialogContent class="border-blue-100 sm:max-w-md dark:border-slate-700">
             <DialogHeader class="flex items-center justify-center">
                 <div
-                    class="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm"
+                    class="mb-3 w-auto rounded-full border border-blue-100 bg-white p-0.5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
                 >
                     <div
-                        class="relative overflow-hidden rounded-full border border-border bg-muted p-2.5"
+                        class="relative overflow-hidden rounded-full border border-blue-200 bg-sky-50 p-2.5 dark:border-slate-700 dark:bg-slate-800"
                     >
                         <div
                             class="absolute inset-0 grid grid-cols-5 opacity-50"
@@ -136,9 +136,7 @@ watch(
                                 class="border-b border-border last:border-b-0"
                             />
                         </div>
-                        <ScanLine
-                            class="relative z-20 size-6 text-foreground"
-                        />
+                        <ScanLine class="relative z-20 size-6 text-blue-700 dark:text-sky-300" />
                     </div>
                 </div>
                 <DialogTitle>{{ modalConfig.title }}</DialogTitle>
@@ -184,7 +182,10 @@ watch(
                         </div>
 
                         <div class="flex w-full items-center space-x-5">
-                            <Button class="w-full" @click="handleModalNextStep">
+                            <Button
+                                class="w-full bg-blue-600 text-white hover:bg-blue-700 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
+                                @click="handleModalNextStep"
+                            >
                                 {{ modalConfig.buttonText }}
                             </Button>
                         </div>
@@ -192,11 +193,9 @@ watch(
                         <div
                             class="relative flex w-full items-center justify-center"
                         >
-                            <div
-                                class="absolute inset-0 top-1/2 h-px w-full bg-border"
-                            />
-                            <span class="relative bg-card px-2 py-1"
-                                >or, enter the code manually</span
+                            <div class="absolute inset-0 top-1/2 h-px w-full bg-blue-100 dark:bg-slate-700" />
+                            <span class="relative bg-white px-2 py-1 text-slate-600 dark:bg-slate-900 dark:text-slate-300"
+                                >o ingresa el código manualmente</span
                             >
                         </div>
 
@@ -221,11 +220,11 @@ watch(
                                     />
                                     <button
                                         @click="copy(manualSetupKey || '')"
-                                        class="relative block h-auto border-l border-border px-3 hover:bg-muted"
+                                        class="relative block h-auto border-l border-blue-200 px-3 hover:bg-sky-50 dark:border-slate-700 dark:hover:bg-slate-800"
                                     >
                                         <Check
                                             v-if="copied"
-                                            class="w-4 text-green-500"
+                                            class="w-4 text-emerald-500"
                                         />
                                         <Copy v-else class="w-4" />
                                     </button>
@@ -281,14 +280,14 @@ watch(
                                     @click="showVerificationStep = false"
                                     :disabled="processing"
                                 >
-                                    Back
+                                    Volver
                                 </Button>
                                 <Button
                                     type="submit"
-                                    class="w-auto flex-1"
+                                    class="w-auto flex-1 bg-blue-600 text-white hover:bg-blue-700 dark:bg-sky-500 dark:text-slate-950 dark:hover:bg-sky-400"
                                     :disabled="processing || code.length < 6"
                                 >
-                                    Confirm
+                                    Confirmar
                                 </Button>
                             </div>
                         </div>

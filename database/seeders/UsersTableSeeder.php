@@ -32,9 +32,6 @@ class UsersTableSeeder extends Seeder
 
     public function run(): void
     {
-        // Grab the first available branch for branch-scoped users.
-        // If no branches exist yet, branch-scoped users get branch_id = null
-        // and can be updated once branches are seeded.
         $firstBranch = Branch::first();
 
         foreach (self::USERS as $role => $data) {

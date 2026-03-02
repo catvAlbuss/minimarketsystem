@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { type BreadcrumbItem } from '@/types';
 import { computed, ref } from 'vue';
 import ProductsController from '@/actions/App/Http/Controllers/ProductsController';
 import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { index as productsIndex } from '@/routes/products';
+import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

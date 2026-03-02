@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
 import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
 import InputError from '@/components/InputError.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
 
 type Providers = {
     id: number;
@@ -57,6 +57,9 @@ const isEditing = computed(() => editingId.value !== null);
 const totalProveedores = computed(() => provider.value.length);
 const proveedoresActivos = computed(
     () => provider.value.filter((p) => p.status === 'active').length,
+);
+const proveedoresInactivos = computed(
+    () => provider.value.filter((p) => p.status !== 'active').length,
 );
 const productosAsociados = computed(
     () => new Set(provider.value.map((p) => p.id_products)).size,
@@ -189,256 +192,182 @@ const categoryLabel = (cat: string) =>
 </script>
 
 <template>
+
     <Head title="Proveedores" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="min-h-screen bg-gray-50 p-6 md:p-8">
-            <!-- ── Botón Nuevo Proveedor ── -->
-            <div class="mb-6 flex justify-end">
-                <button
-                    @click="prepararModalNuevo"
-                    class="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 font-semibold text-white shadow-md transition-all hover:bg-blue-700"
-                >
-                    <i class="ph ph-plus-circle text-xl"></i>
-                    Nuevo Proveedor
+        <div
+            class="min-h-screen bg-slate-50 p-4 text-slate-900 transition-colors md:p-6 dark:bg-slate-950 dark:text-slate-100">
+            <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">Gestion de
+                        proveedores</h1>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        Administra contactos, categorias y solicitudes de pedido desde una sola vista.
+                    </p>
+                </div>
+                <button @click="prepararModalNuevo"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+                    <i class="ph ph-plus-circle text-lg"></i>
+                    Nuevo proveedor
                 </button>
             </div>
 
-            <!-- ── KPIs ── -->
-            <div
-                class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4"
-            >
+            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div
-                    class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6"
-                >
-                    <p class="mb-1 text-xs text-gray-500 md:text-sm">
-                        Total Proveedores
-                    </p>
-                    <p class="text-2xl font-bold text-gray-800 md:text-3xl">
+                    class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <p class="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">Total proveedores</p>
+                    <p class="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">
                         {{ totalProveedores }}
                     </p>
                 </div>
                 <div
-                    class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6"
-                >
-                    <p class="mb-1 text-xs text-gray-500 md:text-sm">
-                        Proveedores Activos
-                    </p>
-                    <p class="text-2xl font-bold text-green-600 md:text-3xl">
+                    class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/20">
+                    <p class="text-xs uppercase tracking-wide text-emerald-700 dark:text-emerald-300">Activos</p>
+                    <p class="mt-1 text-2xl font-bold text-emerald-700 dark:text-emerald-300">
                         {{ proveedoresActivos }}
                     </p>
                 </div>
                 <div
-                    class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6"
-                >
-                    <p class="mb-1 text-xs text-gray-500 md:text-sm">
-                        Productos Asociados
-                    </p>
-                    <p class="text-2xl font-bold text-blue-600 md:text-3xl">
-                        {{ productosAsociados }}
+                    class="rounded-xl border border-amber-200 bg-amber-50 p-4 shadow-sm dark:border-amber-900/60 dark:bg-amber-950/20">
+                    <p class="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">Inactivos</p>
+                    <p class="mt-1 text-2xl font-bold text-amber-700 dark:text-amber-300">
+                        {{ proveedoresInactivos }}
                     </p>
                 </div>
                 <div
-                    class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm md:p-6"
-                >
-                    <p class="mb-1 text-xs text-gray-500 md:text-sm">
-                        Pedidos Pendientes
-                    </p>
-                    <p class="text-2xl font-bold text-orange-600 md:text-3xl">
-                        3
+                    class="rounded-xl border border-blue-200 bg-blue-50 p-4 shadow-sm dark:border-blue-900/60 dark:bg-blue-950/20">
+                    <p class="text-xs uppercase tracking-wide text-blue-700 dark:text-blue-300">Productos asociados</p>
+                    <p class="mt-1 text-2xl font-bold text-blue-700 dark:text-blue-300">
+                        {{ productosAsociados }}
                     </p>
                 </div>
             </div>
 
-            <!-- ── Búsqueda ── -->
             <div
-                class="mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
-            >
+                class="mb-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <div class="relative">
-                    <!-- Lupa SVG nativa, siempre visible -->
-                    <svg
-                        class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="2"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z"
-                        />
+                    <svg class="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 21-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" />
                     </svg>
-                    <input
-                        v-model="searchQuery"
-                        type="text"
-                        placeholder="Buscar por nombre o RUC..."
-                        class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pr-10 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                    />
-                    <!-- X para limpiar -->
-                    <button
-                        v-if="searchQuery"
-                        @click="searchQuery = ''"
-                        class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
-                    >
-                        <svg
-                            class="h-4 w-4"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="2"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M6 18 18 6M6 6l12 12"
-                            />
+                    <input v-model="searchQuery" type="text" placeholder="Buscar por nombre o RUC..."
+                        class="w-full rounded-lg border border-slate-300 bg-white py-2.5 pr-10 pl-9 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-500" />
+                    <button v-if="searchQuery" @click="searchQuery = ''"
+                        class="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
+                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
                     </button>
                 </div>
-                <!-- Indicador siempre visible -->
                 <p class="mt-2 text-xs">
                     <template v-if="searchQuery">
-                        <span class="font-medium text-blue-600"
-                            >{{ proveedoresFiltrados.length }} resultado{{
+                        <span class="font-medium text-blue-600 dark:text-blue-400">{{ proveedoresFiltrados.length }}
+                            resultado{{
                                 proveedoresFiltrados.length !== 1 ? 's' : ''
-                            }}</span
-                        >
-                        <span class="text-gray-400"> para </span>
-                        <span class="font-semibold text-gray-700"
-                            >"{{ searchQuery }}"</span
-                        >
+                            }}</span>
+                        <span class="text-slate-400 dark:text-slate-500"> para </span>
+                        <span class="font-semibold text-slate-700 dark:text-slate-300">"{{ searchQuery }}"</span>
                     </template>
                     <template v-else>
-                        <span class="text-gray-400"
-                            >{{ provider.length }} proveedor{{
-                                provider.length !== 1 ? 'es' : ''
-                            }}
-                            en total</span
-                        >
+                        <span class="text-slate-500 dark:text-slate-400">{{ provider.length }} proveedor{{
+                            provider.length !== 1 ? 'es' : ''
+                        }}
+                            en total</span>
                     </template>
                 </p>
             </div>
-            <!-- ── Tarjetas de Proveedores ── -->
-            <div
-                class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3"
-            >
-                <div
-                    v-for="prov in proveedoresFiltrados"
-                    :key="prov.id"
-                    class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-                >
+
+            <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div v-for="prov in proveedoresFiltrados" :key="prov.id"
+                    class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
                     <div class="mb-3 flex items-start justify-between">
                         <div>
-                            <h5
-                                class="text-base leading-tight font-bold text-gray-800"
-                            >
+                            <h5 class="text-base leading-tight font-bold text-slate-900 dark:text-slate-100">
                                 {{ prov.company_name }}
                             </h5>
-                            <p class="mt-0.5 text-xs text-gray-400">
+                            <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                                 RUC: {{ prov.ruc }}
                             </p>
                         </div>
-                        <span
-                            class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                            :class="
-                                prov.status === 'active'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-gray-100 text-gray-500'
-                            "
-                        >
+                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold" :class="prov.status === 'active'
+                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200'
+                            ">
                             {{
                                 prov.status === 'active' ? 'Activo' : 'Inactivo'
                             }}
                         </span>
                     </div>
 
-                    <div class="mb-4 space-y-1.5 text-sm text-gray-600">
+                    <div class="mb-4 space-y-1.5 text-sm text-slate-600 dark:text-slate-300">
                         <p class="flex items-center gap-2">
-                            <i class="ph ph-user shrink-0 text-gray-400"></i>
-                            {{ prov.contact_person || '—' }}
+                            <i class="ph ph-user shrink-0 text-slate-400 dark:text-slate-500"></i>
+                            {{ prov.contact_person || '-' }}
                         </p>
                         <p class="flex items-center gap-2">
-                            <i class="ph ph-phone shrink-0 text-gray-400"></i>
-                            <a
-                                :href="`https://wa.me/51${prov.phone}`"
-                                class="text-green-600 hover:underline"
-                                >{{ prov.phone }}</a
-                            >
+                            <i class="ph ph-phone shrink-0 text-slate-400 dark:text-slate-500"></i>
+                            <a :href="`https://wa.me/51${prov.phone}`"
+                                class="text-emerald-600 hover:underline dark:text-emerald-400">{{ prov.phone }}</a>
                         </p>
                         <p class="flex items-center gap-2">
-                            <i class="ph ph-tag shrink-0 text-gray-400"></i>
+                            <i class="ph ph-tag shrink-0 text-slate-400 dark:text-slate-500"></i>
                             {{ categoryLabel(prov.category) }}
                         </p>
                     </div>
 
-                    <div class="flex gap-2 border-t border-gray-100 pt-3">
-                        <button
-                            @click="verDetalle(prov)"
-                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-50"
-                        >
+                    <div class="flex gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
+                        <button @click="verDetalle(prov)"
+                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                             <i class="ph ph-eye"></i> Ver
                         </button>
-                        <button
-                            @click="startEdit(prov)"
-                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-blue-200 px-3 py-2 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50"
-                        >
+                        <button @click="startEdit(prov)"
+                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-blue-200 px-3 py-2 text-xs font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-900/60 dark:text-blue-300 dark:hover:bg-blue-950/40">
                             <i class="ph ph-pencil-simple"></i> Editar
                         </button>
-                        <button
-                            @click="
-                                abrirPedido(prov, prov.description_products)
+                        <button @click="
+                            abrirPedido(prov, prov.description_products)
                             "
-                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700"
-                        >
+                            class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-blue-700">
                             <i class="ph ph-truck"></i> Pedir
                         </button>
-                        <button
-                            @click="abrirEliminar(prov)"
-                            class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-500 transition-colors hover:bg-red-50"
-                        >
+                        <button @click="abrirEliminar(prov)"
+                            class="rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-500 transition-colors hover:bg-red-50 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/40">
                             <i class="ph ph-trash"></i>
                         </button>
                     </div>
                 </div>
 
-                <div
-                    v-if="proveedoresFiltrados.length === 0"
-                    class="col-span-full py-12 text-center text-gray-400"
-                >
+                <div v-if="proveedoresFiltrados.length === 0"
+                    class="col-span-full rounded-xl border border-dashed border-slate-300 py-12 text-center text-slate-500 dark:border-slate-700 dark:text-slate-400">
                     <i class="ph ph-truck mb-3 block text-5xl"></i>
                     <p class="font-medium">No se encontraron proveedores</p>
                 </div>
             </div>
 
-            <!-- ── Tabla Productos y Stock ── -->
-
             <div
-                class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
-            >
+                class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <section>
-                    <div class="border-b border-gray-200 px-6 py-4">
-                        <h5
-                            class="flex items-center gap-2 font-semibold text-gray-900"
-                        >
+                    <div class="border-b border-slate-200 px-6 py-4 dark:border-slate-800">
+                        <h5 class="flex items-center gap-2 font-semibold text-slate-900 dark:text-slate-100">
                             <i class="ph ph-package text-blue-600"></i>
-                            Productos y Stock por Proveedor
+                            Productos y stock por proveedor
                         </h5>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm">
                             <thead
-                                class="bg-gray-50 text-xs text-gray-600 uppercase"
-                            >
+                                class="bg-slate-50 text-xs uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                                 <tr>
                                     <th class="px-6 py-3 font-semibold">
                                         Proveedor
                                     </th>
                                     <th class="px-6 py-3 font-semibold">RUC</th>
                                     <th class="px-6 py-3 font-semibold">
-                                        Categoría
+                                        Categoria
                                     </th>
                                     <th class="px-6 py-3 font-semibold">
                                         Producto
@@ -447,51 +376,40 @@ const categoryLabel = (cat: string) =>
                                         Estado
                                     </th>
                                     <th class="px-6 py-3 font-semibold">
-                                        Acción
+                                        Accion
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100">
-                                <tr v-if="provider.length === 0">
-                                    <td
-                                        colspan="6"
-                                        class="px-6 py-6 text-center text-gray-400"
-                                    >
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                <tr v-if="proveedoresFiltrados.length === 0">
+                                    <td colspan="6" class="px-6 py-6 text-center text-slate-500 dark:text-slate-400">
                                         No hay proveedores registrados.
                                     </td>
                                 </tr>
-                                <tr
-                                    v-for="prov in provider"
-                                    :key="prov.id"
-                                    class="transition-colors hover:bg-gray-50"
-                                >
-                                    <td
-                                        class="px-6 py-3 font-medium text-gray-800"
-                                    >
+                                <tr v-for="prov in proveedoresFiltrados" :key="prov.id"
+                                    class="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                                    <td class="px-6 py-3 font-medium text-slate-900 dark:text-slate-100">
                                         {{ prov.company_name }}
                                     </td>
-                                    <td class="px-6 py-3 text-gray-600">
+                                    <td class="px-6 py-3 text-slate-600 dark:text-slate-300">
                                         {{ prov.ruc }}
                                     </td>
                                     <td class="px-6 py-3">
                                         <span
-                                            class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700"
-                                        >
+                                            class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
                                             {{ categoryLabel(prov.category) }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-3 text-gray-600">
+                                    <td class="px-6 py-3 text-slate-600 dark:text-slate-300">
                                         {{ prov.description_products }}
                                     </td>
                                     <td class="px-6 py-3">
                                         <span
                                             class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                                            :class="
-                                                prov.status === 'active'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-500'
-                                            "
-                                        >
+                                            :class="prov.status === 'active'
+                                                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                                                    : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200'
+                                                ">
                                             {{
                                                 prov.status === 'active'
                                                     ? 'Activo'
@@ -500,15 +418,13 @@ const categoryLabel = (cat: string) =>
                                         </span>
                                     </td>
                                     <td class="px-6 py-3">
-                                        <button
-                                            @click="
-                                                abrirPedido(
-                                                    prov,
-                                                    prov.description_products,
-                                                )
+                                        <button @click="
+                                            abrirPedido(
+                                                prov,
+                                                prov.description_products
+                                            )
                                             "
-                                            class="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs text-white transition-colors hover:bg-blue-700"
-                                        >
+                                            class="flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1.5 text-xs text-white transition-colors hover:bg-blue-700">
                                             <i class="ph ph-truck"></i> Pedir
                                         </button>
                                     </td>
@@ -526,26 +442,16 @@ const categoryLabel = (cat: string) =>
          MODAL: Ver Detalle (solo lectura — datos como texto)
     -->
     <Teleport to="body">
-        <div
-            v-if="showViewModal && proveedorSeleccionado"
-            class="fixed inset-0 z-[70] flex items-center justify-center p-4"
-        >
-            <div
-                class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm"
-                @click="showViewModal = false"
-            ></div>
+        <div v-if="showViewModal && proveedorSeleccionado"
+            class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm" @click="showViewModal = false"></div>
 
-            <div
-                class="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl bg-white shadow-xl"
-            >
+            <div class="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl bg-white shadow-xl">
                 <!-- Header con avatar -->
-                <div
-                    class="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-5"
-                >
+                <div class="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-5">
                     <div class="flex items-center gap-3">
                         <div
-                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600"
-                        >
+                            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg font-bold text-blue-600">
                             {{
                                 proveedorSeleccionado.company_name
                                     .charAt(0)
@@ -553,9 +459,7 @@ const categoryLabel = (cat: string) =>
                             }}
                         </div>
                         <div>
-                            <h3
-                                class="text-xl leading-tight font-semibold text-gray-900"
-                            >
+                            <h3 class="text-xl leading-tight font-semibold text-gray-900">
                                 {{ proveedorSeleccionado.company_name }}
                             </h3>
                             <p class="mt-0.5 text-xs text-gray-400">
@@ -564,32 +468,23 @@ const categoryLabel = (cat: string) =>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span
-                            class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
-                            :class="
-                                proveedorSeleccionado.status === 'active'
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+                            :class="proveedorSeleccionado.status === 'active'
                                     ? 'bg-green-100 text-green-700'
                                     : 'bg-gray-100 text-gray-500'
-                            "
-                        >
-                            <span
-                                class="h-1.5 w-1.5 rounded-full"
-                                :class="
-                                    proveedorSeleccionado.status === 'active'
-                                        ? 'animate-pulse bg-green-500'
-                                        : 'bg-gray-400'
-                                "
-                            ></span>
+                                ">
+                            <span class="h-1.5 w-1.5 rounded-full" :class="proveedorSeleccionado.status === 'active'
+                                    ? 'animate-pulse bg-green-500'
+                                    : 'bg-gray-400'
+                                "></span>
                             {{
                                 proveedorSeleccionado.status === 'active'
                                     ? 'Activo'
                                     : 'Inactivo'
                             }}
                         </span>
-                        <button
-                            @click="showViewModal = false"
-                            class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                        >
+                        <button @click="showViewModal = false"
+                            class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                             <i class="ph ph-x text-xl"></i>
                         </button>
                     </div>
@@ -600,9 +495,7 @@ const categoryLabel = (cat: string) =>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Razón Social -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-buildings"></i> Razón Social
                             </p>
                             <p class="text-sm font-semibold text-gray-800">
@@ -611,9 +504,7 @@ const categoryLabel = (cat: string) =>
                         </div>
                         <!-- RUC -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-identification-card"></i> RUC
                             </p>
                             <p class="text-sm font-semibold text-gray-800">
@@ -625,9 +516,7 @@ const categoryLabel = (cat: string) =>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Contacto -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-user"></i> Persona de Contacto
                             </p>
                             <p class="text-sm font-semibold text-gray-800">
@@ -638,39 +527,30 @@ const categoryLabel = (cat: string) =>
                         </div>
                         <!-- Teléfono -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-phone"></i> Teléfono
                             </p>
-                            <a
-                                :href="`https://wa.me/51${proveedorSeleccionado.phone}`"
-                                class="text-sm font-semibold text-green-600 hover:underline"
-                                >{{ proveedorSeleccionado.phone }}</a
-                            >
+                            <a :href="`https://wa.me/51${proveedorSeleccionado.phone}`"
+                                class="text-sm font-semibold text-green-600 hover:underline">{{
+                                proveedorSeleccionado.phone
+                                }}</a>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Email -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-envelope"></i> Correo
                                 Electrónico
                             </p>
-                            <p
-                                class="text-sm font-semibold break-all text-gray-800"
-                            >
+                            <p class="text-sm font-semibold break-all text-gray-800">
                                 {{ proveedorSeleccionado.email || '—' }}
                             </p>
                         </div>
                         <!-- Dirección -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-map-pin"></i> Dirección
                             </p>
                             <p class="text-sm font-semibold text-gray-800">
@@ -682,14 +562,11 @@ const categoryLabel = (cat: string) =>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Categoría -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-tag"></i> Categoría
                             </p>
                             <span
-                                class="inline-flex items-center rounded-lg bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700"
-                            >
+                                class="inline-flex items-center rounded-lg bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
                                 {{
                                     categoryLabel(
                                         proveedorSeleccionado.category,
@@ -699,9 +576,7 @@ const categoryLabel = (cat: string) =>
                         </div>
                         <!-- Producto -->
                         <div class="rounded-xl bg-gray-50 p-4">
-                            <p
-                                class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase"
-                            >
+                            <p class="mb-1.5 flex items-center gap-1.5 text-xs tracking-wide text-gray-400 uppercase">
                                 <i class="ph ph-package"></i> Producto /
                                 Descripción
                             </p>
@@ -717,28 +592,21 @@ const categoryLabel = (cat: string) =>
 
                 <!-- Footer -->
                 <div
-                    class="flex shrink-0 flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse"
-                >
-                    <button
-                        type="button"
-                        @click="editarDesdeVista"
-                        class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 sm:w-auto"
-                    >
+                    class="flex shrink-0 flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse">
+                    <button type="button" @click="editarDesdeVista"
+                        class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 sm:w-auto">
                         <i class="ph ph-pencil-simple"></i> Editar Proveedor
                     </button>
-                    <button
-                        type="button"
-                        @click="
-                            () => {
-                                abrirPedido(
-                                    proveedorSeleccionado!,
-                                    proveedorSeleccionado!.description_products,
-                                );
-                                showViewModal = false;
-                            }
-                        "
-                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto"
-                    >
+                    <button type="button" @click="
+                        () => {
+                            abrirPedido(
+                                proveedorSeleccionado!,
+                                proveedorSeleccionado!.description_products,
+                            );
+                            showViewModal = false;
+                        }
+                    "
+                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto">
                         <i class="ph ph-truck"></i> Solicitar Pedido
                     </button>
                 </div>
@@ -750,21 +618,11 @@ const categoryLabel = (cat: string) =>
          MODAL: Nuevo / Editar Proveedor (con inputs)
     -->
     <Teleport to="body">
-        <div
-            v-if="showModal"
-            class="fixed inset-0 z-[70] flex items-center justify-center p-4"
-        >
-            <div
-                class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm"
-                @click="resetForm"
-            ></div>
+        <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm" @click="resetForm"></div>
 
-            <div
-                class="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl bg-white shadow-xl"
-            >
-                <div
-                    class="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-5"
-                >
+            <div class="relative z-10 flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl bg-white shadow-xl">
+                <div class="flex shrink-0 items-center justify-between border-b border-gray-100 px-6 py-5">
                     <h3 class="text-xl font-semibold text-gray-900">
                         {{
                             isEditing
@@ -772,140 +630,76 @@ const categoryLabel = (cat: string) =>
                                 : 'Registrar Nuevo Proveedor'
                         }}
                     </h3>
-                    <button
-                        @click="resetForm"
-                        class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                    >
+                    <button @click="resetForm"
+                        class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                         <i class="ph ph-x text-xl"></i>
                     </button>
                 </div>
 
-                <form
-                    @submit.prevent="submit"
-                    class="space-y-4 overflow-y-auto bg-white px-6 py-5"
-                >
+                <form @submit.prevent="submit" class="space-y-4 overflow-y-auto bg-white px-6 py-5">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Razón Social *</label
-                            >
-                            <input
-                                v-model="form.company_name"
-                                type="text"
-                                required
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Razón Social *</label>
+                            <input v-model="form.company_name" type="text" required
                                 placeholder="Ej: Distribuidora Central SAC"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                            />
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                             <InputError :message="form.errors.company_name" />
                         </div>
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >RUC *</label
-                            >
-                            <input
-                                v-model="form.ruc"
-                                type="text"
-                                required
-                                placeholder="20123456789"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                            />
+                            <label class="mb-1 block text-sm font-medium text-gray-700">RUC *</label>
+                            <input v-model="form.ruc" type="text" required placeholder="20123456789"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                             <InputError :message="form.errors.ruc" />
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Teléfono *</label
-                            >
-                            <input
-                                v-model="form.phone"
-                                type="text"
-                                required
-                                placeholder="929252113"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                            />
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Teléfono *</label>
+                            <input v-model="form.phone" type="text" required placeholder="929252113"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                             <InputError :message="form.errors.phone" />
                         </div>
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Correo Electrónico</label
-                            >
-                            <input
-                                v-model="form.email"
-                                type="email"
-                                :disabled="isEditing"
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                            <input v-model="form.email" type="email" :disabled="isEditing"
                                 placeholder="ventas@central.com"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
-                            />
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400" />
                             <InputError :message="form.errors.email" />
                         </div>
                     </div>
 
                     <div>
-                        <label
-                            class="mb-1 block text-sm font-medium text-gray-700"
-                            >Dirección</label
-                        >
-                        <input
-                            v-model="form.address"
-                            type="text"
-                            placeholder="Av. Principal 123, Distrito"
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                        />
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Dirección</label>
+                        <input v-model="form.address" type="text" placeholder="Av. Principal 123, Distrito"
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                         <InputError :message="form.errors.address" />
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Persona de Contacto</label
-                            >
-                            <input
-                                v-model="form.contact_person"
-                                type="text"
-                                placeholder="Juan Pérez"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                            />
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Persona de Contacto</label>
+                            <input v-model="form.contact_person" type="text" placeholder="Juan Pérez"
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                             <InputError :message="form.errors.contact_person" />
                         </div>
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Categoría</label
-                            >
-                            <select
-                                v-model="form.category"
-                                required
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                            >
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Categoría</label>
+                            <select v-model="form.category" required
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
                                 <option value="" disabled class="text-gray-400">
                                     Tipo de categoría
                                 </option>
-                                <option
-                                    value="wholesaler"
-                                    class="text-gray-900"
-                                >
+                                <option value="wholesaler" class="text-gray-900">
                                     Mayorista
                                 </option>
                                 <option value="retailer" class="text-gray-900">
                                     Minorista
                                 </option>
-                                <option
-                                    value="distributor"
-                                    class="text-gray-900"
-                                >
+                                <option value="distributor" class="text-gray-900">
                                     Distribuidor
                                 </option>
-                                <option
-                                    value="manufacturer"
-                                    class="text-gray-900"
-                                >
+                                <option value="manufacturer" class="text-gray-900">
                                     Fabricante
                                 </option>
                             </select>
@@ -915,69 +709,38 @@ const categoryLabel = (cat: string) =>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Selecciona un Producto</label
-                            >
-                            <select
-                                v-model="form.id_products"
-                                required
-                                @change="autocompletDescription"
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Selecciona un Producto</label>
+                            <select v-model="form.id_products" required @change="autocompletDescription"
                                 class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                                :class="
-                                    !form.id_products
+                                :class="!form.id_products
                                         ? 'text-gray-400'
                                         : 'text-gray-900'
-                                "
-                            >
+                                    ">
                                 <option value="" disabled class="text-gray-400">
                                     — Selecciona un producto —
                                 </option>
-                                <option
-                                    v-for="prod in product"
-                                    :key="prod.id"
-                                    :value="prod.id"
-                                    class="text-gray-900"
-                                >
+                                <option v-for="prod in product" :key="prod.id" :value="prod.id" class="text-gray-900">
                                     {{ prod.code || prod.id }}
                                 </option>
                             </select>
-                            <p
-                                v-if="!form.id_products && form.isDirty"
-                                class="mt-1 text-xs text-red-500"
-                            >
+                            <p v-if="!form.id_products && form.isDirty" class="mt-1 text-xs text-red-500">
                                 Debes seleccionar un producto
                             </p>
                             <InputError :message="form.errors.id_products" />
                         </div>
                         <div>
-                            <label
-                                class="mb-1 block text-sm font-medium text-gray-700"
-                                >Descripción del Producto</label
-                            >
-                            <input
-                                v-model="form.description_products"
-                                type="text"
-                                :disabled="isEditing"
+                            <label class="mb-1 block text-sm font-medium text-gray-700">Descripción del Producto</label>
+                            <input v-model="form.description_products" type="text" :disabled="isEditing"
                                 placeholder="Descripción producto"
-                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400"
-                            />
-                            <InputError
-                                :message="form.errors.description_products"
-                            />
+                                class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400" />
+                            <InputError :message="form.errors.description_products" />
                         </div>
                     </div>
 
                     <div>
-                        <label
-                            class="mb-1 block text-sm font-medium text-gray-700"
-                            >Estado</label
-                        >
-                        <select
-                            v-model="form.status"
-                            required
-                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                        >
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Estado</label>
+                        <select v-model="form.status" required
+                            class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none">
                             <option value="" disabled class="text-gray-400">
                                 Tipo de estado
                             </option>
@@ -993,25 +756,17 @@ const categoryLabel = (cat: string) =>
                 </form>
 
                 <div
-                    class="flex shrink-0 flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse"
-                >
-                    <button
-                        type="button"
-                        @click="submit"
-                        :disabled="form.processing || deleteForm.processing"
-                        class="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50 sm:w-auto"
-                    >
+                    class="flex shrink-0 flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse">
+                    <button type="button" @click="submit" :disabled="form.processing || deleteForm.processing"
+                        class="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 disabled:opacity-50 sm:w-auto">
                         {{
                             isEditing
                                 ? 'Actualizar Proveedor'
                                 : 'Guardar Proveedor'
                         }}
                     </button>
-                    <button
-                        type="button"
-                        @click="resetForm"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto"
-                    >
+                    <button type="button" @click="resetForm"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto">
                         Cancelar
                     </button>
                 </div>
@@ -1023,21 +778,11 @@ const categoryLabel = (cat: string) =>
          MODAL: Confirmar Eliminación
      -->
     <Teleport to="body">
-        <div
-            v-if="showDeleteModal"
-            class="fixed inset-0 z-[70] flex items-center justify-center p-4"
-        >
-            <div
-                class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm"
-                @click="showDeleteModal = false"
-            ></div>
-            <div
-                class="relative z-10 w-full max-w-md rounded-xl bg-white shadow-xl"
-            >
+        <div v-if="showDeleteModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm" @click="showDeleteModal = false"></div>
+            <div class="relative z-10 w-full max-w-md rounded-xl bg-white shadow-xl">
                 <div class="rounded-t-xl bg-red-600 px-6 py-4">
-                    <h3
-                        class="flex items-center gap-2 text-lg font-semibold text-white"
-                    >
+                    <h3 class="flex items-center gap-2 text-lg font-semibold text-white">
                         <i class="ph ph-warning-circle text-xl"></i> Confirmar
                         Eliminación
                     </h3>
@@ -1047,29 +792,20 @@ const categoryLabel = (cat: string) =>
                         ¿Estás seguro de que deseas eliminar al proveedor
                         <strong class="font-semibold">{{
                             proveedorAEliminar?.company_name
-                        }}</strong
-                        >?
+                            }}</strong>?
                     </p>
                     <p class="text-sm text-gray-500">
                         Esta acción no se puede deshacer.
                     </p>
                 </div>
                 <div
-                    class="flex flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse"
-                >
-                    <button
-                        type="button"
-                        @click="confirmarEliminar"
-                        :disabled="deleteForm.processing"
-                        class="w-full rounded-lg bg-red-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50 sm:w-auto"
-                    >
+                    class="flex flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse">
+                    <button type="button" @click="confirmarEliminar" :disabled="deleteForm.processing"
+                        class="w-full rounded-lg bg-red-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50 sm:w-auto">
                         Eliminar
                     </button>
-                    <button
-                        type="button"
-                        @click="showDeleteModal = false"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto"
-                    >
+                    <button type="button" @click="showDeleteModal = false"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto">
                         Cancelar
                     </button>
                 </div>
@@ -1081,38 +817,23 @@ const categoryLabel = (cat: string) =>
          MODAL: Solicitar Pedido
      -->
     <Teleport to="body">
-        <div
-            v-if="showPedidoModal"
-            class="fixed inset-0 z-[70] flex items-center justify-center p-4"
-        >
-            <div
-                class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm"
-                @click="showPedidoModal = false"
-            ></div>
-            <div
-                class="relative z-10 w-full max-w-lg rounded-xl bg-white shadow-xl"
-            >
-                <div
-                    class="flex items-center justify-between border-b border-gray-100 px-6 py-5"
-                >
+        <div v-if="showPedidoModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-gray-900/75 backdrop-blur-sm" @click="showPedidoModal = false"></div>
+            <div class="relative z-10 w-full max-w-lg rounded-xl bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 px-6 py-5">
                     <h3 class="text-lg font-semibold text-gray-900">
                         Solicitar Pedido a Proveedor
                     </h3>
-                    <button
-                        @click="showPedidoModal = false"
-                        class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
-                    >
+                    <button @click="showPedidoModal = false"
+                        class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                         <i class="ph ph-x text-xl"></i>
                     </button>
                 </div>
                 <div class="space-y-4 px-6 py-5">
                     <!-- Info del proveedor como texto -->
-                    <div
-                        class="flex items-center gap-3 rounded-xl bg-blue-50 p-4"
-                    >
+                    <div class="flex items-center gap-3 rounded-xl bg-blue-50 p-4">
                         <div
-                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-200 text-base font-bold text-blue-700"
-                        >
+                            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-200 text-base font-bold text-blue-700">
                             {{
                                 pedidoProveedor?.company_name
                                     .charAt(0)
@@ -1130,46 +851,24 @@ const categoryLabel = (cat: string) =>
                     </div>
 
                     <div>
-                        <label
-                            class="mb-1 block text-sm font-medium text-gray-700"
-                            >Cantidad Solicitada *</label
-                        >
-                        <input
-                            v-model.number="pedidoCantidad"
-                            type="number"
-                            min="1"
-                            required
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                        />
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Cantidad Solicitada *</label>
+                        <input v-model.number="pedidoCantidad" type="number" min="1" required
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
                     </div>
                     <div>
-                        <label
-                            class="mb-1 block text-sm font-medium text-gray-700"
-                            >Notas Adicionales</label
-                        >
-                        <textarea
-                            v-model="pedidoNotas"
-                            rows="2"
-                            placeholder="Especificaciones adicionales..."
-                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                        ></textarea>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Notas Adicionales</label>
+                        <textarea v-model="pedidoNotas" rows="2" placeholder="Especificaciones adicionales..."
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"></textarea>
                     </div>
                 </div>
                 <div
-                    class="flex flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse"
-                >
-                    <button
-                        type="button"
-                        @click="confirmarPedido"
-                        class="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 sm:w-auto"
-                    >
+                    class="flex flex-col gap-3 rounded-b-xl border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex-row-reverse">
+                    <button type="button" @click="confirmarPedido"
+                        class="w-full rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 sm:w-auto">
                         Enviar Solicitud
                     </button>
-                    <button
-                        type="button"
-                        @click="showPedidoModal = false"
-                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto"
-                    >
+                    <button type="button" @click="showPedidoModal = false"
+                        class="w-full rounded-lg border border-gray-300 bg-white px-5 py-2.5 font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:w-auto">
                         Cancelar
                     </button>
                 </div>

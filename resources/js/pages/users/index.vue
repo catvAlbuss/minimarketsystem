@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
 import { ref, computed } from 'vue';
 import UserController from '@/actions/App/Http/Controllers/UserController';
 
 import InputError from '@/components/InputError.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
 
 type Users = {
     id: number;
