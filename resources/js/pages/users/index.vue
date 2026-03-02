@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
 import { ref, computed } from 'vue';
 import UserController from '@/actions/App/Http/Controllers/UserController';
 
 import InputError from '@/components/InputError.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
 
 type Users = {
     id: number;
@@ -158,6 +158,7 @@ const roleLabel = (role: string) =>
         logistic: 'Logística',
         cashier: 'Cajero',
         asistente: 'Asistente',
+        cliente: 'Cliente',
     })[role] ?? role;
 
 const roleBadgeClass = (role: string) => {
@@ -754,6 +755,7 @@ const roleBadgeClass = (role: string) => {
                                     <option value="logistic">Logística</option>
                                     <option value="cashier">Cajero</option>
                                     <option value="asistente">Asistente</option>
+                                    <option value="cliente">Cliente</option>
                                 </select>
                                 <InputError :message="form.errors.role" />
                             </div>

@@ -16,7 +16,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable, TwoFactorAuthenticatable, HasRoles;
 
     // Roles that have global (cross-branch) access
-    const GLOBAL_ROLES = ['root', 'gerencia', 'administracion_general'];
+    // these are the *internal* role identifiers (not the human labels)
+    const GLOBAL_ROLES = ['root', 'managment', 'administrator_general'];
 
     /**
      * The attributes that are mass assignable.

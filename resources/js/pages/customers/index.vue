@@ -2,10 +2,8 @@
 import { Head, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { computed, ref } from 'vue';
-import CustomerController from '@/actions/App/Http/Controllers/CustomerController';
-import InputError from '@/components/InputError.vue';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

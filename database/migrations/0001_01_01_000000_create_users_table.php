@@ -29,7 +29,19 @@ return new class extends Migration
             $table->timestamp('entry_date');
             $table->enum('retention',['yes','no']);
             $table->enum('entry_to_payroll',['yes','no']);
-            $table->enum('role',['root', 'managment', 'administrator_general', 'logistic_general','administrator','logistic' ,'cashier','asistente']);
+            // the set of machine-friendly role identifiers used throughout the app
+            // (note: spanish-only names like "gerencia" live in the UI labels only).
+            $table->enum('role',[
+                'root',
+                'managment',
+                'administrator_general',
+                'logistic_general',
+                'administrator',
+                'logistic',
+                'cashier',
+                'asistente',
+                'cliente', // customers may also be stored as users
+            ]);
             $table->enum('state', ['active', 'inactive']);
             $table->rememberToken();
             $table->timestamps();

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
 import ProviderController from '@/actions/App/Http/Controllers/ProviderController';
 import InputError from '@/components/InputError.vue';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
 
 type Providers = {
     id: number;
@@ -57,6 +57,9 @@ const isEditing = computed(() => editingId.value !== null);
 const totalProveedores = computed(() => provider.value.length);
 const proveedoresActivos = computed(
     () => provider.value.filter((p) => p.status === 'active').length,
+);
+const proveedoresInactivos = computed(
+    () => provider.value.filter((p) => p.status !== 'active').length,
 );
 const productosAsociados = computed(
     () => new Set(provider.value.map((p) => p.id_products)).size,
@@ -189,6 +192,7 @@ const categoryLabel = (cat: string) =>
 </script>
 
 <template>
+
     <Head title="Proveedores" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
@@ -204,10 +208,7 @@ const categoryLabel = (cat: string) =>
                 </button>
             </div>
 
-            <!-- ── KPIs ── -->
-            <div
-                class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4"
-            >
+            <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div
                     class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm md:p-6"
                 >
@@ -250,7 +251,6 @@ const categoryLabel = (cat: string) =>
                 </div>
             </div>
 
-            <!-- ── Búsqueda ── -->
             <div
                 class="mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm"
             >
@@ -387,9 +387,8 @@ const categoryLabel = (cat: string) =>
                         >
                             <i class="ph ph-pencil-simple"></i> Editar
                         </button>
-                        <button
-                            @click="
-                                abrirPedido(prov, prov.description_products)
+                        <button @click="
+                            abrirPedido(prov, prov.description_products)
                             "
                             class="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 dark:bg-blue-500 px-3 py-2 text-xs font-medium text-white shadow-lg shadow-blue-600/30 dark:shadow-blue-500/30 transition-all hover:bg-blue-700 dark:hover:bg-blue-600 hover:scale-105 hover:shadow-blue-600/50 dark:hover:shadow-blue-500/50"
                         >
@@ -412,8 +411,6 @@ const categoryLabel = (cat: string) =>
                     <p class="font-medium">No se encontraron proveedores</p>
                 </div>
             </div>
-
-            <!-- ── Tabla Productos y Stock ── -->
 
             <div
                 class="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
@@ -438,7 +435,7 @@ const categoryLabel = (cat: string) =>
                                     </th>
                                     <th class="px-6 py-3 font-semibold">RUC</th>
                                     <th class="px-6 py-3 font-semibold">
-                                        Categoría
+                                        Categoria
                                     </th>
                                     <th class="px-6 py-3 font-semibold">
                                         Producto
@@ -447,7 +444,7 @@ const categoryLabel = (cat: string) =>
                                         Estado
                                     </th>
                                     <th class="px-6 py-3 font-semibold">
-                                        Acción
+                                        Accion
                                     </th>
                                 </tr>
                             </thead>
@@ -500,12 +497,11 @@ const categoryLabel = (cat: string) =>
                                         </span>
                                     </td>
                                     <td class="px-6 py-3">
-                                        <button
-                                            @click="
-                                                abrirPedido(
-                                                    prov,
-                                                    prov.description_products,
-                                                )
+                                        <button @click="
+                                            abrirPedido(
+                                                prov,
+                                                prov.description_products
+                                            )
                                             "
                                             class="inline-flex items-center gap-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg shadow-blue-600/30 dark:shadow-blue-500/30 transition-all hover:bg-blue-700 dark:hover:bg-blue-600 hover:scale-105 hover:shadow-blue-600/50 dark:hover:shadow-blue-500/50"
                                         >
@@ -1047,8 +1043,7 @@ const categoryLabel = (cat: string) =>
                         ¿Estás seguro de que deseas eliminar al proveedor
                         <strong class="font-semibold dark:text-white">{{
                             proveedorAEliminar?.company_name
-                        }}</strong
-                        >?
+                            }}</strong>?
                     </p>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         Esta acción no se puede deshacer.
